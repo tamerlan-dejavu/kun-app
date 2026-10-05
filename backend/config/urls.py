@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
@@ -18,3 +19,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include(api_v1)),
 ]
+
+if settings.DEBUG:
+    # Только dev: вход по паролю в браузерный API DRF (/api/v1/auth/dev/login/)
+    # под демо-пользователями, пока нет входа по телефону. В production этих URL нет.
+    urlpatterns += [path("api/v1/auth/dev/", include("rest_framework.urls"))]

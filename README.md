@@ -32,6 +32,11 @@ make superuser     # вход в /admin
 Демо-данные (пользователи, сборы, чат, оценки, жалобы): `make seed`.
 Чистая БД с нуля: `make reset-db` (удаляет только тома проекта `kun-app`).
 
+Попробовать API руками, пока нет входа по телефону (только dev):
+http://localhost/api/v1/auth/dev/login/ → `+77000000001` / `kun-demo` (модератор — `+77000000000`).
+После входа открывается браузерный API DRF: лента `/api/v1/gatherings`, сбор `/api/v1/gatherings/1`,
+кнопки POST для join/leave. Swagger: http://localhost/api/v1/docs/
+
 ## Модель данных
 
 | Приложение | Таблицы |

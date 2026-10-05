@@ -96,10 +96,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description GET /gatherings — лента; POST /gatherings — создать сбор. */
-        get: operations["gatherings_retrieve"];
+        /**
+         * Лента сборов
+         * @description GET /gatherings — лента; POST /gatherings — создать сбор.
+         */
+        get: operations["gatherings_list"];
         put?: never;
-        /** @description GET /gatherings — лента; POST /gatherings — создать сбор. */
+        /**
+         * Создать сбор
+         * @description GET /gatherings — лента; POST /gatherings — создать сбор.
+         */
         post: operations["gatherings_create"];
         delete?: never;
         options?: never;
@@ -114,14 +120,20 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description GET /gatherings/{id}; PATCH — только создатель. */
-        get: operations["gatherings_retrieve_2"];
+        /**
+         * Сбор целиком
+         * @description GET /gatherings/{id}; PATCH — только создатель.
+         */
+        get: operations["gatherings_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** @description GET /gatherings/{id}; PATCH — только создатель. */
+        /**
+         * Изменить время, место, комментарий (создатель)
+         * @description GET /gatherings/{id}; PATCH — только создатель.
+         */
         patch: operations["gatherings_partial_update"];
         trace?: never;
     };
@@ -134,7 +146,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description POST /gatherings/{id}/attendance — «Я пришёл», участник. */
+        /** «Я пришёл» (участник, от начала до +12 ч) */
         post: operations["gatherings_attendance_create"];
         delete?: never;
         options?: never;
@@ -151,7 +163,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description POST /gatherings/{id}/cancel — создатель, с причиной. */
+        /** Отменить с причиной (создатель) */
         post: operations["gatherings_cancel_create"];
         delete?: never;
         options?: never;
@@ -168,7 +180,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description POST /gatherings/{id}/join */
+        /** Присоединиться */
         post: operations["gatherings_join_create"];
         delete?: never;
         options?: never;
@@ -185,7 +197,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description POST /gatherings/{id}/leave */
+        /** Выйти */
         post: operations["gatherings_leave_create"];
         delete?: never;
         options?: never;
@@ -220,7 +232,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description POST /gatherings/{id}/ratings — участник. */
+        /** Оценить участников (участник, до +48 ч) */
         post: operations["gatherings_ratings_create"];
         delete?: never;
         options?: never;
@@ -274,8 +286,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description GET /me/gatherings — будущие и прошедшие. */
-        get: operations["me_gatherings_retrieve"];
+        /**
+         * Мои сборы
+         * @description GET /me/gatherings?when=upcoming|past
+         */
+        get: operations["me_gatherings_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -360,7 +375,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description GET /public/gatherings/{slug} — без личных данных, для SSR и Open Graph. */
+        /**
+         * Сбор по ссылке без личных данных
+         * @description Без входа: для SSR страницы /g/<slug> и превью в мессенджерах.
+         */
         get: operations["public_gatherings_retrieve"];
         put?: never;
         post?: never;
@@ -463,7 +481,228 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        CancelRequest: {
+            reason: string;
+        };
+        Category: {
+            /** Код */
+            slug: string;
+            /** Название */
+            name: string;
+            /** Эмодзи */
+            emoji?: string;
+        };
+        /** @description Место из поиска 2ГИС: координаты приходят отдельными полями, в БД — PointField. */
+        GatheringCreateRequest: {
+            /** Код */
+            category: string;
+            /** Название */
+            title: string;
+            /** Комментарий */
+            comment?: string;
+            /** Название места */
+            place_name: string;
+            /** Адрес */
+            address: string;
+            /** Район */
+            district?: string;
+            /** Id места в 2ГИС */
+            place_external_id: string;
+            /** Format: double */
+            lat: number;
+            /** Format: double */
+            lng: number;
+            /**
+             * Начало
+             * Format: date-time
+             */
+            starts_at: string;
+            seats: number;
+        };
+        /** @description Сбор целиком: точный адрес, координаты, участники. */
+        GatheringDetail: {
+            readonly id: number;
+            slug?: string;
+            /** Название */
+            title: string;
+            category: components["schemas"]["Category"];
+            /**
+             * Начало
+             * Format: date-time
+             */
+            starts_at: string;
+            /** Название места */
+            place_name: string;
+            /** Район */
+            district?: string;
+            /** Мест всего */
+            seats: number;
+            participants_count: number;
+            /** Статус */
+            status?: components["schemas"]["StatusEnum"];
+            /** @default false */
+            is_participant: boolean;
+            /**
+             * Format: double
+             * @description если в запросе были lat/lng
+             */
+            distance_m?: number | null;
+            /** Комментарий */
+            comment?: string;
+            /** Адрес */
+            address: string;
+            /** Id места в 2ГИС */
+            place_external_id: string;
+            /** Format: double */
+            readonly lat: number;
+            /** Format: double */
+            readonly lng: number;
+            creator: components["schemas"]["UserShort"];
+            readonly is_creator: boolean;
+            readonly participants: components["schemas"]["Participant"][];
+            /** Модерация */
+            moderation_status?: components["schemas"]["ModerationStatusEnum"];
+            /** Причина отмены */
+            cancel_reason?: string;
+            /**
+             * Отменён
+             * Format: date-time
+             */
+            cancelled_at?: string | null;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /** @description Карточка ленты. */
+        GatheringList: {
+            readonly id: number;
+            slug?: string;
+            /** Название */
+            title: string;
+            category: components["schemas"]["Category"];
+            /**
+             * Начало
+             * Format: date-time
+             */
+            starts_at: string;
+            /** Название места */
+            place_name: string;
+            /** Район */
+            district?: string;
+            /** Мест всего */
+            seats: number;
+            participants_count: number;
+            /** Статус */
+            status?: components["schemas"]["StatusEnum"];
+            /** @default false */
+            is_participant: boolean;
+            /**
+             * Format: double
+             * @description если в запросе были lat/lng
+             */
+            distance_m?: number | null;
+        };
+        /** @description Для страницы /g/<slug> гостю и Open Graph: без имён, фото и точного адреса. */
+        GatheringPublic: {
+            slug?: string;
+            /** Название */
+            title: string;
+            category: components["schemas"]["Category"];
+            /**
+             * Начало
+             * Format: date-time
+             */
+            starts_at: string;
+            /** Район */
+            district?: string;
+            /** Мест всего */
+            seats: number;
+            participants_count: number;
+            /** Статус */
+            status?: components["schemas"]["StatusEnum"];
+        };
+        /**
+         * @description * `published` - Опубликован
+         *     * `pending` - На проверке
+         *     * `hidden` - Скрыт модератором
+         * @enum {string}
+         */
+        ModerationStatusEnum: "published" | "pending" | "hidden";
+        PaginatedGatheringListList: {
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?cursor=cD00ODY%3D"
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+             */
+            previous?: string | null;
+            results: components["schemas"]["GatheringList"][];
+        };
+        Participant: {
+            user: components["schemas"]["UserShort"];
+            is_creator: boolean;
+            /** Format: date-time */
+            joined_at: string;
+        };
+        /** @description Изменить можно время, место, комментарий. Место меняется целиком. */
+        PatchedGatheringUpdateRequest: {
+            /**
+             * Начало
+             * Format: date-time
+             */
+            starts_at?: string;
+            /** Комментарий */
+            comment?: string;
+            /** Название места */
+            place_name?: string;
+            /** Адрес */
+            address?: string;
+            /** Район */
+            district?: string;
+            /** Id места в 2ГИС */
+            place_external_id?: string;
+            /** Format: double */
+            lat?: number;
+            /** Format: double */
+            lng?: number;
+        };
+        RatingItemRequest: {
+            user_id: number;
+            value: components["schemas"]["ValueEnum"];
+        };
+        RatingsRequest: {
+            ratings: components["schemas"]["RatingItemRequest"][];
+        };
+        /**
+         * @description * `open` - Набор открыт
+         *     * `full` - Мест нет
+         *     * `cancelled` - Отменён
+         *     * `finished` - Прошёл
+         * @enum {string}
+         */
+        StatusEnum: "open" | "full" | "cancelled" | "finished";
+        /** @description Участник в сборе: имя, фото, вуз. Телефон не отдаём никогда. */
+        UserShort: {
+            readonly id: number;
+            /** Имя */
+            name?: string;
+            /**
+             * Фото
+             * Format: uri
+             */
+            photo?: string | null;
+            university?: string;
+        };
+        /**
+         * @description * `ok` - Пришёл, всё хорошо
+         *     * `no_show` - Не пришёл
+         * @enum {string}
+         */
+        ValueEnum: "ok" | "no_show";
+    };
     responses: never;
     parameters: never;
     requestBodies: never;
@@ -564,21 +803,37 @@ export interface operations {
             };
         };
     };
-    gatherings_retrieve: {
+    gatherings_list: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description slug категории */
+                category?: string;
+                /** @description The pagination cursor value. */
+                cursor?: string;
+                /**
+                 * @description по календарю Алматы
+                 *
+                 *     * `today` - today
+                 *     * `tomorrow` - tomorrow
+                 *     * `week` - week
+                 */
+                date?: "today" | "tomorrow" | "week";
+                lat?: number;
+                lng?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PaginatedGatheringListList"];
+                };
             };
         };
     };
@@ -589,18 +844,25 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GatheringCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["GatheringCreateRequest"];
+                "multipart/form-data": components["schemas"]["GatheringCreateRequest"];
+            };
+        };
         responses: {
-            /** @description No response body */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GatheringDetail"];
+                };
             };
         };
     };
-    gatherings_retrieve_2: {
+    gatherings_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -611,12 +873,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GatheringDetail"];
+                };
             };
         };
     };
@@ -629,14 +892,21 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedGatheringUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedGatheringUpdateRequest"];
+                "multipart/form-data": components["schemas"]["PatchedGatheringUpdateRequest"];
+            };
+        };
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GatheringDetail"];
+                };
             };
         };
     };
@@ -651,8 +921,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
-            200: {
+            /** @description Отмечено */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -669,14 +939,21 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancelRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["CancelRequest"];
+                "multipart/form-data": components["schemas"]["CancelRequest"];
+            };
+        };
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GatheringDetail"];
+                };
             };
         };
     };
@@ -691,12 +968,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GatheringDetail"];
+                };
             };
         };
     };
@@ -711,12 +989,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GatheringDetail"];
+                };
             };
         };
     };
@@ -769,10 +1048,16 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RatingsRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["RatingsRequest"];
+                "multipart/form-data": components["schemas"]["RatingsRequest"];
+            };
+        };
         responses: {
-            /** @description No response body */
-            200: {
+            /** @description Сохранено */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -852,21 +1137,30 @@ export interface operations {
             };
         };
     };
-    me_gatherings_retrieve: {
+    me_gatherings_list: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description The pagination cursor value. */
+                cursor?: string;
+                /**
+                 * @description * `upcoming` - upcoming
+                 *     * `past` - past
+                 */
+                when?: "upcoming" | "past";
+            };
             header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PaginatedGatheringListList"];
+                };
             };
         };
     };
@@ -971,12 +1265,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GatheringPublic"];
+                };
             };
         };
     };
