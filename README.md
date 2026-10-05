@@ -27,7 +27,7 @@ make superuser     # вход в /admin
 - сайт: http://localhost
 - API и Swagger: http://localhost/api/v1/docs/
 - админка: http://localhost/admin/
-- Postgres: localhost:5432, база `kun`, пользователь/пароль `kun`/`kun` (DataGrip, psql)
+- Postgres: localhost:**5433** (порт в `DB_HOST_PORT`), база `kun`, пользователь/пароль `kun`/`kun` (DataGrip, psql)
 
 Демо-данные (пользователи, сборы, чат, оценки, жалобы): `make seed`.
 Чистая БД с нуля: `make reset-db` (удаляет только тома проекта `kun-app`).
