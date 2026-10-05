@@ -11,7 +11,8 @@ export const metadata: Metadata = {
   title: { default: "KUN", template: "%s — KUN" },
   description: "Собери компанию в кино, на прогулку или в клуб",
   manifest: "/manifest.webmanifest",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost"),
+  // ||, а не ??: build-arg без значения приходит пустой строкой, а new URL("") падает
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost"),
 };
 
 export const viewport: Viewport = {
