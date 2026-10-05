@@ -1,7 +1,7 @@
 """Чат сбора (раздел 3.4 ТЗ): отправка, системные сообщения, рассылка по WebSocket.
 
 Рассылка — только после коммита транзакции: клиент не получит сообщение, которого нет в БД.
-TODO: уведомление участникам о новом сообщении (не чаще 1 раза в 10 минут) — с notifications.
+Остальным участникам — уведомление о новых сообщениях, не чаще 1 раза в 10 минут.
 """
 
 from datetime import timedelta
@@ -79,6 +79,18 @@ def post_message(gathering, user, text: str) -> Message:
 
     message = Message.objects.create(gathering=gathering, author=user, text=text)
     broadcast(gathering.pk, "message.new", serialize(message))
+
+    from apps.notifications.dispatcher import gathering_context, notify
+    from apps.notifications.types import NotificationType
+
+    others = Participation.objects.filter(gathering=gathering, left_at__isnull=True).exclude(
+        user=user
+    )
+    notify(
+        list(others.values_list("user_id", flat=True)),
+        NotificationType.CHAT_MESSAGE,
+        gathering_context(gathering),
+    )
     return message
 
 

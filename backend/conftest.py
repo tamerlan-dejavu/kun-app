@@ -35,3 +35,19 @@ def client_for():
         return client
 
     return make
+
+
+@pytest.fixture
+def sent_notifications(monkeypatch):
+    """Перехватывает постановку уведомлений в очередь: список (user_id, type, context, sms).
+    on_commit в диспетчере выполняется сразу — как будто транзакция уже закоммичена."""
+    from apps.notifications import dispatcher, tasks
+
+    calls = []
+    monkeypatch.setattr(dispatcher.transaction, "on_commit", lambda fn: fn())
+    monkeypatch.setattr(
+        tasks.deliver,
+        "delay",
+        lambda uid, ntype, ctx, sms=False: calls.append((uid, ntype, ctx, sms)),
+    )
+    return calls

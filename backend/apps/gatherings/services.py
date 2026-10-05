@@ -3,7 +3,8 @@
 Всё, что меняет состав участников, — в transaction.atomic с select_for_update на строке сбора:
 два одновременных «Иду» на последнее место выстраиваются в очередь, второй получает «мест нет».
 
-TODO: уведомления (notifications.dispatcher) и события аналитики — вместе с этими модулями.
+Уведомления ставятся в очередь после коммита (notifications.dispatcher).
+TODO: события аналитики (analytics.events) — вместе с этим модулем.
 """
 
 from datetime import timedelta
@@ -17,6 +18,8 @@ from apps.chat.services import post_system_message
 from apps.common.exceptions import KunError
 from apps.common.permissions import ensure_can_act
 from apps.moderation.text_check import contains_banned_words
+from apps.notifications.dispatcher import gathering_context, notify
+from apps.notifications.types import NotificationType
 
 from .models import Attendance, Gathering, Participation, Rating
 from .selectors import blocked_user_ids
@@ -65,6 +68,11 @@ def _require_creator(gathering, user):
 
 def _active_count(gathering) -> int:
     return gathering.participations.filter(left_at__isnull=True).count()
+
+
+def _member_ids(gathering, exclude=None) -> list[int]:
+    ids = gathering.participations.filter(left_at__isnull=True).values_list("user_id", flat=True)
+    return [uid for uid in ids if uid != getattr(exclude, "pk", None)]
 
 
 def _lock(gathering) -> Gathering:
@@ -127,13 +135,16 @@ def update_gathering(gathering, user, data: dict) -> Gathering:
         f for f in changed if f not in ("location", "place_external_id", "moderation_status")
     ]
     post_system_message(gathering, Message.SystemEvent.UPDATED, {"fields": visible})
+    notify(
+        _member_ids(gathering, exclude=user), NotificationType.UPDATED, gathering_context(gathering)
+    )
     return gathering
 
 
 @transaction.atomic
 def cancel_gathering(gathering, user, reason: str) -> Gathering:
-    """Отмена создателем с причиной.
-    TODO: уведомить всех участников; SMS, если до начала меньше 3 часов."""
+    """Отмена создателем с причиной. Участникам — уведомление (выключить нельзя),
+    а если до начала меньше 3 часов — ещё и SMS."""
     gathering = _lock(gathering)
     _require_creator(gathering, user)
     if gathering.status not in ACTIVE_STATUSES:
@@ -145,6 +156,13 @@ def cancel_gathering(gathering, user, reason: str) -> Gathering:
     gathering.cancelled_at = now
     gathering.save(update_fields=["status", "cancel_reason", "cancelled_at", "updated_at"])
     post_system_message(gathering, Message.SystemEvent.CANCELLED, {"reason": reason})
+    urgent = gathering.starts_at - now < timedelta(hours=RULES["SMS_CANCEL_THRESHOLD_HOURS"])
+    notify(
+        _member_ids(gathering, exclude=user),
+        NotificationType.CANCELLED,
+        gathering_context(gathering, reason=reason),
+        sms=urgent,
+    )
     return gathering
 
 
@@ -183,6 +201,11 @@ def join_gathering(gathering, user) -> Participation:
         gathering.save(update_fields=["status", "updated_at"])
     post_system_message(
         gathering, Message.SystemEvent.JOINED, {"user_id": user.pk, "name": user.name}
+    )
+    notify(
+        [gathering.creator_id],
+        NotificationType.JOINED_LEFT,
+        gathering_context(gathering, joined=True, actor=user.name),
     )
     return participation
 
@@ -227,7 +250,13 @@ def leave_gathering(gathering, user) -> Gathering:
     if gathering.status == Gathering.Status.FULL:
         gathering.status = Gathering.Status.OPEN
         update_fields.append("status")
-    if was_creator:
+    if not was_creator:
+        notify(
+            [gathering.creator_id],
+            NotificationType.JOINED_LEFT,
+            gathering_context(gathering, joined=False, actor=user.name),
+        )
+    else:
         heir = remaining.select_related("user").first()
         heir.is_creator = True
         heir.save(update_fields=["is_creator"])
