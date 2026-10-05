@@ -212,10 +212,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description GET /gatherings/{id}/messages — история (курсор); POST — отправка. Только участник. */
-        get: operations["gatherings_messages_retrieve"];
+        /**
+         * История чата (новые сверху)
+         * @description GET /gatherings/{id}/messages — история; POST — отправка. Только участник.
+         */
+        get: operations["gatherings_messages_list"];
         put?: never;
-        /** @description GET /gatherings/{id}/messages — история (курсор); POST — отправка. Только участник. */
+        /**
+         * Отправить сообщение
+         * @description GET /gatherings/{id}/messages — история; POST — отправка. Только участник.
+         */
         post: operations["gatherings_messages_create"];
         delete?: never;
         options?: never;
@@ -482,6 +488,8 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @enum {unknown} */
+        BlankEnum: "";
         CancelRequest: {
             reason: string;
         };
@@ -622,6 +630,36 @@ export interface components {
             status?: components["schemas"]["StatusEnum"];
         };
         /**
+         * @description * `user` - Сообщение участника
+         *     * `system` - Системное
+         * @enum {string}
+         */
+        KindEnum: "user" | "system";
+        /** @description Сообщение в истории и в событии message.new. Скрытое — без текста и данных. */
+        Message: {
+            readonly id: number;
+            gathering: number;
+            /** Тип */
+            kind?: components["schemas"]["KindEnum"];
+            /** Событие */
+            system_event?: components["schemas"]["SystemEventEnum"] | components["schemas"]["BlankEnum"];
+            author: components["schemas"]["UserShort"] | null;
+            readonly text: string;
+            readonly payload: {
+                [key: string]: unknown;
+            };
+            /** Скрыто модератором */
+            is_hidden?: boolean;
+            /**
+             * Отправлено
+             * Format: date-time
+             */
+            readonly created_at: string;
+        };
+        MessageCreateRequest: {
+            text: string;
+        };
+        /**
          * @description * `published` - Опубликован
          *     * `pending` - На проверке
          *     * `hidden` - Скрыт модератором
@@ -640,6 +678,19 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["GatheringList"][];
+        };
+        PaginatedMessageList: {
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?cursor=cD00ODY%3D"
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+             */
+            previous?: string | null;
+            results: components["schemas"]["Message"][];
         };
         Participant: {
             user: components["schemas"]["UserShort"];
@@ -684,6 +735,15 @@ export interface components {
          * @enum {string}
          */
         StatusEnum: "open" | "full" | "cancelled" | "finished";
+        /**
+         * @description * `joined` - Присоединился
+         *     * `left` - Вышел
+         *     * `updated` - Сбор изменён
+         *     * `cancelled` - Сбор отменён
+         *     * `creator_changed` - Сменился создатель
+         * @enum {string}
+         */
+        SystemEventEnum: "joined" | "left" | "updated" | "cancelled" | "creator_changed";
         /** @description Участник в сборе: имя, фото, вуз. Телефон не отдаём никогда. */
         UserShort: {
             readonly id: number;
@@ -999,9 +1059,12 @@ export interface operations {
             };
         };
     };
-    gatherings_messages_retrieve: {
+    gatherings_messages_list: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description The pagination cursor value. */
+                cursor?: string;
+            };
             header?: never;
             path: {
                 id: number;
@@ -1010,12 +1073,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PaginatedMessageList"];
+                };
             };
         };
     };
@@ -1028,14 +1092,21 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MessageCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MessageCreateRequest"];
+                "multipart/form-data": components["schemas"]["MessageCreateRequest"];
+            };
+        };
         responses: {
-            /** @description No response body */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["Message"];
+                };
             };
         };
     };

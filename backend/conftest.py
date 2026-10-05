@@ -1,9 +1,18 @@
 """Общие фикстуры pytest."""
 
 import pytest
+from django.core.cache import cache
 from rest_framework.test import APIClient
 
 from tests.factories import UserFactory
+
+
+@pytest.fixture(autouse=True)
+def clear_cache():
+    """Каждый тест — с чистым кэшем: счётчики rate limit не переживают тест."""
+    cache.clear()
+    yield
+    cache.clear()
 
 
 @pytest.fixture
