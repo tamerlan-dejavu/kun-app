@@ -26,8 +26,4 @@ app.conf.beat_schedule = {
         "task": "apps.moderation.tasks.lift_expired_pauses",
         "schedule": crontab(minute=0),
     },
-    "accounts-expire-student-badges": {
-        "task": "apps.universities.tasks.expire_student_badges",
-        "schedule": crontab(hour=3, minute=0),
-    },
 }

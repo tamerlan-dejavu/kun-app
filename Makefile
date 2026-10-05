@@ -19,6 +19,16 @@ makemigrations:
 superuser:
 	$(COMPOSE) run --rm api python manage.py createsuperuser
 
+# Демо-данные для DataGrip и админки (только dev)
+seed:
+	$(COMPOSE) run --rm api python manage.py seed_demo
+
+# Пересоздать локальную БД с нуля: удаляет тома проекта kun-app (БД и статику), не трогая другие проекты
+reset-db:
+	$(COMPOSE) down -v
+	$(COMPOSE) up -d --wait db redis
+	$(COMPOSE) run --rm api python manage.py migrate
+
 test-backend:
 	$(COMPOSE) run --rm api pytest
 
@@ -31,4 +41,4 @@ openapi:
 	$(COMPOSE) run --rm api python manage.py spectacular --file openapi.yaml
 	cd web && npm run gen:api
 
-.PHONY: up down logs migrate makemigrations superuser test-backend check-backend openapi
+.PHONY: up down logs migrate makemigrations superuser seed reset-db test-backend check-backend openapi

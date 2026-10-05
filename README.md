@@ -27,7 +27,26 @@ make superuser     # вход в /admin
 - сайт: http://localhost
 - API и Swagger: http://localhost/api/v1/docs/
 - админка: http://localhost/admin/
-- Postgres: localhost:5432 (kun/kun)
+- Postgres: localhost:5432, база `kun`, пользователь/пароль `kun`/`kun` (DataGrip, psql)
+
+Демо-данные (пользователи, сборы, чат, оценки, жалобы): `make seed`.
+Чистая БД с нуля: `make reset-db` (удаляет только тома проекта `kun-app`).
+
+## Модель данных
+
+| Приложение | Таблицы |
+|---|---|
+| accounts | `user` (вход по телефону, профиль, надёжность), `authcode` (хэши кодов SMS), `usersession` |
+| universities | `university` — справочник для необязательного поля профиля |
+| catalog | `category` (категории сборов), `interest` (интересы профиля) |
+| gatherings | `gathering`, `participation` (left_at IS NULL — в сборе), `attendance` («Я пришёл»), `rating` |
+| chat | `message` (участников и системные) |
+| notifications | `notificationsettings`, `pushsubscription`, `telegramlink` |
+| moderation | `report`, `block`, `usersanction`, `bannedword`, `moderationlog` (UPDATE/DELETE запрещены триггером) |
+
+Правила из ТЗ, которые проверяет сама БД: 3–6 мест, один активный участник и один создатель на сбор,
+«Я пришёл» один раз, нельзя оценить или заблокировать себя, жалоба ровно на одну цель,
+у отменённого сбора есть дата отмены, у паузы — дата окончания. У таблиц и колонок есть комментарии.
 
 В dev SMS не отправляются — код входа пишется в лог сервиса `api`.
 

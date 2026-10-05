@@ -1,2 +1,2 @@
-// TanStack Query: useMe, useUpdateMe, useUploadPhoto, useStudentRequest/Verify, useDeleteAccount
+// TanStack Query: useMe, useUpdateMe, useUploadPhoto, useDeleteAccount
 export {};
