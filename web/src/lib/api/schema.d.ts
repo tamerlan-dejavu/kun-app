@@ -273,7 +273,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description GET /me, PATCH /me (онбординг), DELETE /me (удаление аккаунта). */
+        /**
+         * Свой профиль
+         * @description GET /me, PATCH /me (онбординг), DELETE /me (удаление аккаунта).
+         */
         get: operations["me_retrieve"];
         put?: never;
         post?: never;
@@ -531,7 +534,7 @@ export interface components {
         /** @description Сбор целиком: точный адрес, координаты, участники. */
         GatheringDetail: {
             readonly id: number;
-            slug?: string;
+            readonly slug: string;
             /** Название */
             title: string;
             category: components["schemas"]["Category"];
@@ -584,7 +587,7 @@ export interface components {
         /** @description Карточка ленты. */
         GatheringList: {
             readonly id: number;
-            slug?: string;
+            readonly slug: string;
             /** Название */
             title: string;
             category: components["schemas"]["Category"];
@@ -612,7 +615,8 @@ export interface components {
         };
         /** @description Для страницы /g/<slug> гостю и Open Graph: без имён, фото и точного адреса. */
         GatheringPublic: {
-            slug?: string;
+            readonly id: number;
+            readonly slug: string;
             /** Название */
             title: string;
             category: components["schemas"]["Category"];
@@ -635,6 +639,33 @@ export interface components {
          * @enum {string}
          */
         KindEnum: "user" | "system";
+        /**
+         * @description Свой профиль: телефон виден только самому пользователю.
+         *     TODO: запись (онбординг: 18+, согласия, имя, вуз, интересы) — вместе с входом по телефону.
+         */
+        Me: {
+            readonly id: number;
+            /** Телефон */
+            readonly phone: string;
+            /** Имя */
+            readonly name: string;
+            /**
+             * Фото
+             * Format: uri
+             */
+            readonly photo: string | null;
+            university?: string;
+            /** Роль */
+            readonly role: components["schemas"]["RoleEnum"];
+            /**
+             * Надёжность
+             * Format: double
+             */
+            readonly reliability: number | null;
+            /** Состоявшихся сборов */
+            readonly happened_gatherings_count: number;
+            readonly onboarding_completed: boolean;
+        };
         /** @description Сообщение в истории и в событии message.new. Скрытое — без текста и данных. */
         Message: {
             readonly id: number;
@@ -727,6 +758,13 @@ export interface components {
         RatingsRequest: {
             ratings: components["schemas"]["RatingItemRequest"][];
         };
+        /**
+         * @description * `user` - Пользователь
+         *     * `moderator` - Модератор
+         *     * `admin` - Администратор
+         * @enum {string}
+         */
+        RoleEnum: "user" | "moderator" | "admin";
         /**
          * @description * `open` - Набор открыт
          *     * `full` - Мест нет
@@ -1163,12 +1201,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["Me"];
+                };
             };
         };
     };

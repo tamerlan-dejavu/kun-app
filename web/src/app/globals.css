@@ -7,5 +7,26 @@
 }
 
 body {
-  @apply bg-white font-sans text-neutral-900;
+  @apply bg-canvas font-sans text-ink antialiased;
+}
+
+h1,
+h2,
+h3 {
+  @apply font-heading;
+}
+
+/* Заметный фокус для работы с клавиатуры (WCAG 2.1 AA) */
+:focus-visible {
+  outline: 3px solid theme("colors.brand.600");
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -9,9 +9,12 @@ const config: Config = {
       colors: tokens.colors,
       fontFamily: tokens.fontFamily,
       borderRadius: tokens.radius,
+      boxShadow: tokens.shadow,
       maxWidth: { app: "480px" },
+      // Области нажатия не меньше 44x44 (WCAG 2.1 AA)
       minHeight: { tap: "44px" },
       minWidth: { tap: "44px" },
+      height: { tap: "44px" },
     },
   },
   plugins: [],

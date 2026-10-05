@@ -1,5 +1,9 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from .serializers import MeSerializer
 
 
 class PhoneRequestView(APIView):
@@ -34,8 +38,9 @@ class MeView(APIView):
 
     permission_classes = [IsAuthenticated]  # онбординг доступен до его завершения
 
+    @extend_schema(tags=["me"], summary="Свой профиль", responses=MeSerializer)
     def get(self, request):
-        raise NotImplementedError
+        return Response(MeSerializer(request.user).data)
 
     def patch(self, request):
         raise NotImplementedError

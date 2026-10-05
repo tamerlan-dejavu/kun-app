@@ -1,11 +1,18 @@
-import { FeedFilters } from "@/components/gathering/FeedFilters";
+import type { Metadata } from "next";
+import { t } from "@/i18n";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { FeedList } from "@/components/gathering/FeedList";
 
-// /feed — лента сборов. Состояния: скелетон, пусто («Создай первый сбор»), ошибка.
+export const metadata: Metadata = { title: "Лента" };
+
+// /feed — лента сборов (раздел 3.3 ТЗ)
 export default function FeedPage() {
   return (
     <>
-      <FeedFilters />
-      {/* TODO: FeedList (useFeed, бесконечная прокрутка) */}
+      <PageHeader title={t("feed.title")} />
+      <div className="px-4">
+        <FeedList />
+      </div>
     </>
   );
 }

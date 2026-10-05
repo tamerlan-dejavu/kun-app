@@ -1,4 +1,16 @@
+import clsx from "clsx";
+
 // Состояние «загрузка».
 export function Skeleton({ className = "h-24" }: { className?: string }) {
-  return <div aria-hidden className={`animate-pulse rounded-card bg-neutral-100 ${className}`} />;
+  return <div aria-hidden className={clsx("animate-pulse rounded-card bg-line/60", className)} />;
+}
+
+export function SkeletonList({ count = 3, className = "h-36" }: { count?: number; className?: string }) {
+  return (
+    <div className="space-y-3" role="status" aria-label="Загружаем">
+      {Array.from({ length: count }, (_, i) => (
+        <Skeleton key={i} className={className} />
+      ))}
+    </div>
+  );
 }

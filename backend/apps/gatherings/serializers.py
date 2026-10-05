@@ -61,6 +61,8 @@ class GatheringListSerializer(serializers.ModelSerializer):
             "is_participant",
             "distance_m",
         ]
+        # slug генерируется моделью: в ответе есть всегда (иначе в OpenAPI он «необязательный»)
+        read_only_fields = ["slug"]
 
 
 class GatheringDetailSerializer(GatheringListSerializer):
@@ -121,6 +123,7 @@ class GatheringPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gathering
         fields = [
+            "id",  # нужен вошедшему для действий (join, чат); личных данных не раскрывает
             "slug",
             "title",
             "category",
@@ -130,6 +133,7 @@ class GatheringPublicSerializer(serializers.ModelSerializer):
             "participants_count",
             "status",
         ]
+        read_only_fields = ["slug"]
 
 
 # --- запись ----------------------------------------------------------------------------------

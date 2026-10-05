@@ -21,8 +21,10 @@ def render(ntype: str, ctx: dict) -> dict:
     url = f"{settings.SITE_URL}/g/{ctx.get('slug', '')}"
     match ntype:
         case T.JOINED_LEFT:
-            verb = "присоединился к сбору" if ctx.get("joined") else "вышел из сбора"
-            body = f"{ctx.get('actor', 'Кто-то')} {verb} «{title}»"
+            # Пол по имени не угадываем — без родовых окончаний («присоединился/ась»)
+            actor = ctx.get("actor", "Кто-то")
+            state = "теперь в сборе" if ctx.get("joined") else "больше не в сборе"
+            body = f"{actor} {state} «{title}»"
         case T.CHAT_MESSAGE:
             body = f"Новые сообщения в чате «{title}»"
             url += "/chat"
@@ -35,7 +37,7 @@ def render(ntype: str, ctx: dict) -> dict:
             reason = ctx.get("reason")
             body = f"Сбор «{title}» отменён" + (f": {reason}" if reason else "")
         case T.AFTER_PROMPT:
-            body = f"Как прошла встреча «{title}»? Отметь, что ты пришёл, и оцени остальных"
+            body = f"Как прошла встреча «{title}»? Нажми «Я пришёл» и оцени остальных"
             url += "/after"
         case _:
             body = title

@@ -1,11 +1,9 @@
-import { Skeleton } from "@/components/ui/Skeleton";
+import { SkeletonList } from "@/components/ui/Skeleton";
 
 export default function Loading() {
   return (
-    <div className="space-y-3 p-4">
-      <Skeleton />
-      <Skeleton />
-      <Skeleton />
+    <div className="px-4 pt-16">
+      <SkeletonList />
     </div>
   );
 }
