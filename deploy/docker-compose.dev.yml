@@ -1,0 +1,47 @@
+# Локальная разработка: сборка из исходников, hot reload.
+# Образ бэкенда собирается один раз (сервис api) и переиспользуется в ws/worker/beat.
+
+x-backend-dev: &backend-dev
+  pull_policy: never        # образ kun/api:local собирает сервис api, из реестра не тянем
+  volumes: ["../backend:/app"]
+
+services:
+  web:
+    build:
+      context: ../web
+      target: deps          # стадия с node_modules; исходники монтируются томом
+    command: npm run dev
+    volumes:
+      - ../web:/app
+      - /app/node_modules   # node_modules из образа, а не с хоста
+
+  api:
+    build:
+      context: ../backend
+      args:
+        INSTALL_DEV: "1"
+    # миграции при старте (иначе beat с DatabaseScheduler падает на пустой БД);
+    # collectstatic — nginx раздаёт /static/ из тома, в т. ч. стили админки
+    command: sh -c "python manage.py migrate --noinput && python manage.py collectstatic --noinput -v 0 && python manage.py runserver 0.0.0.0:8000"
+    volumes: ["../backend:/app"]
+    healthcheck:   # healthy = миграции применены и сервер отвечает
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/api/v1/health/', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+  ws:
+    <<: *backend-dev
+
+  worker:
+    <<: *backend-dev
+
+  beat:
+    <<: *backend-dev
+    depends_on:
+      api:
+        condition: service_healthy
+
+  db:
+    ports: ["5432:5432"]

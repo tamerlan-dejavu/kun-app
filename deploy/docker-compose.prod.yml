@@ -1,0 +1,15 @@
+# staging/production: образы из GHCR (${REGISTRY}/api:${IMAGE_TAG}), TLS (Let's Encrypt).
+services:
+  nginx:
+    ports: ["443:443"]   # добавляется к 80:80 из базового файла
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/www/certbot:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done'"
+    restart: unless-stopped

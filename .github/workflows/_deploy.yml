@@ -1,0 +1,99 @@
+name: _deploy (reusable)
+
+# Настройки GitHub Environment (staging / production):
+#   secrets: DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY
+#   vars:    SITE_URL, VAPID_PUBLIC_KEY, SENTRY_DSN_WEB   (вшиваются в бандл web при сборке)
+# На сервере: /opt/kun/.env (см. .env.example), Docker с compose-плагином.
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      image_tag:
+        type: string
+        required: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    # выкладки в одно окружение — строго по очереди
+    concurrency:
+      group: deploy-${{ inputs.environment }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      packages: write
+    env:
+      REGISTRY: ghcr.io/${{ github.repository }}
+      # Пока сервер не настроен — только собираем и пушим образы, без SSH
+      HAS_SERVER: ${{ secrets.DEPLOY_HOST != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Образ api
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: true
+          tags: ${{ env.REGISTRY }}/api:${{ inputs.image_tag }}
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,scope=api,mode=max
+
+      - name: Образ web
+        uses: docker/build-push-action@v6
+        with:
+          context: web
+          push: true
+          tags: ${{ env.REGISTRY }}/web:${{ inputs.image_tag }}
+          build-args: |
+            NEXT_PUBLIC_SITE_URL=${{ vars.SITE_URL }}
+            NEXT_PUBLIC_VAPID_PUBLIC_KEY=${{ vars.VAPID_PUBLIC_KEY }}
+            NEXT_PUBLIC_SENTRY_DSN=${{ vars.SENTRY_DSN_WEB }}
+          cache-from: type=gha,scope=web-${{ inputs.environment }}
+          cache-to: type=gha,scope=web-${{ inputs.environment }},mode=max
+
+      - name: Сервер не настроен
+        if: env.HAS_SERVER != 'true'
+        run: echo "::notice::DEPLOY_HOST не задан в Environment '${{ inputs.environment }}' — образы собраны, выкладка пропущена"
+
+      - name: Конфиги deploy/ на сервер
+        if: env.HAS_SERVER == 'true'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: deploy
+          target: /opt/kun
+
+      - name: Выкладка по SSH
+        if: env.HAS_SERVER == 'true'
+        uses: appleboy/ssh-action@v1
+        env:
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          envs: GHCR_USER,GHCR_TOKEN,IMAGE_TAG
+          script: |
+            set -e
+            cd /opt/kun
+            chmod +x deploy/scripts/*.sh
+            # токен GITHUB_TOKEN живёт только во время job — после выкладки выходим
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            trap 'docker logout ghcr.io' EXIT
+            IMAGE_TAG="$IMAGE_TAG" deploy/scripts/deploy.sh

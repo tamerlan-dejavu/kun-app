@@ -1,0 +1,9 @@
+# Все текстовые файлы в репозитории — с LF. Иначе на Windows-чекауте .sh получат CRLF
+# и упадут на сервере и в контейнерах (`bash\r: not found`).
+* text=auto eol=lf
+*.sh text eol=lf
+
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff2 binary

@@ -1,0 +1,23 @@
+name: Deploy staging
+
+# Каждый merge в develop: CI -> сборка образов -> выкладка на staging.
+on:
+  push:
+    branches: [develop]
+
+# Права для вложенных workflow: пуш образов в GHCR. По умолчанию токен — только чтение.
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    needs: ci
+    uses: ./.github/workflows/_deploy.yml
+    with:
+      environment: staging
+      image_tag: ${{ github.sha }}
+    secrets: inherit
