@@ -44,4 +44,5 @@ services:
         condition: service_healthy
 
   db:
-    ports: ["5432:5432"]
+    # Наружу на 5433: 5432 часто занят локально установленным PostgreSQL
+    ports: ["${DB_HOST_PORT:-5433}:5432"]

@@ -2,8 +2,8 @@
 
 
 def create_gathering(user, data):
-    """Проверки: лимит 3 активных, окно времени, места, students_only только со значком,
-    место из поиска (place_external_id). Автопроверка текста -> moderation_status=pending."""
+    """Проверки: лимит 3 активных, окно времени, места, место из поиска (place_external_id).
+    Автопроверка текста -> moderation_status=pending."""
     raise NotImplementedError
 
 
@@ -18,7 +18,7 @@ def cancel_gathering(gathering, user, reason: str):
 
 
 def join_gathering(gathering, user):
-    """Одна транзакция: свободные места, блокировки с участниками, students_only."""
+    """Одна транзакция: свободные места, блокировки с участниками."""
     raise NotImplementedError
 
 

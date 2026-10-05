@@ -1,7 +1,7 @@
 """Запросы на чтение: лента, мои сборы."""
 
 
-def feed_queryset(user, *, date=None, category=None, students_only=False, point=None):
+def feed_queryset(user, *, date=None, category=None, point=None):
     """status=open, moderation_status=published, без заблокированных и создателей с санкциями;
     сортировка по starts_at или по расстоянию (если передан point)."""
     raise NotImplementedError
