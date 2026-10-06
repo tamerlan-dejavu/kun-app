@@ -12,7 +12,7 @@ export function MessageBubble({ message, mine }: { message: Message; mine: boole
       <div
         className={clsx(
           "max-w-[78%] rounded-card px-4 py-2.5",
-          mine ? "rounded-br-md bg-brand-200" : "rounded-bl-md bg-surface shadow-card",
+          mine ? "rounded-br-md bg-brand-100" : "rounded-bl-md bg-surface shadow-card",
         )}
       >
         {!mine && <p className="text-xs font-semibold text-brand-700">{message.author?.name}</p>}

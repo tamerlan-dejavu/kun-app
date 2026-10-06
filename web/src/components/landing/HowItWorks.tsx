@@ -1,4 +1,5 @@
 import { t } from "@/i18n";
+import { Container } from "@/components/layout/Container";
 
 const STEPS = [
   ["landing.step1Title", "landing.step1Text"],
@@ -8,24 +9,24 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section className="px-5 py-8">
-      <h2 className="mb-5 text-xl">{t("landing.howTitle")}</h2>
-      <ol className="space-y-3">
-        {STEPS.map(([title, text], i) => (
-          <li key={title} className="flex gap-4 rounded-card bg-surface p-4 shadow-card">
-            <span
-              aria-hidden
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand font-heading"
-            >
-              {i + 1}
-            </span>
-            <div>
-              <h3 className="mb-1 text-base">{t(title)}</h3>
+    <section id="how" className="scroll-mt-20 py-14 md:py-20">
+      <Container>
+        <h2 className="mb-8 text-2xl md:text-4xl">{t("landing.howTitle")}</h2>
+        <ol className="grid gap-4 md:grid-cols-3 md:gap-6">
+          {STEPS.map(([title, text], i) => (
+            <li key={title} className="rounded-card bg-surface p-6 shadow-card md:p-8">
+              <span
+                aria-hidden
+                className="mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-brand font-heading text-lg text-white"
+              >
+                {i + 1}
+              </span>
+              <h3 className="mb-2 text-lg">{t(title)}</h3>
               <p className="text-ink-muted">{t(text)}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
+            </li>
+          ))}
+        </ol>
+      </Container>
     </section>
   );
 }

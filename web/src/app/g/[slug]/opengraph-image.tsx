@@ -6,5 +6,5 @@ export const contentType = "image/png";
 // Карточка-превью сбора для мессенджеров.
 export default async function OgImage() {
   // TODO: категория, название, время, «идут N из M» в стиле KUN
-  return new ImageResponse(<div style={{ background: "#FFB066", width: "100%", height: "100%" }} />, size);
+  return new ImageResponse(<div style={{ background: "#537179", width: "100%", height: "100%" }} />, size);
 }

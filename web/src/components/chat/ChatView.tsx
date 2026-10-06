@@ -25,7 +25,7 @@ export function ChatView({ gatheringId, readOnly }: Props) {
   const qc = useQueryClient();
   const [live, setLive] = useState<Message[]>([]);
   const [status, setStatus] = useState<WsStatus>("connecting");
-  const bottom = useRef<HTMLDivElement>(null);
+  const scroller = useRef<HTMLDivElement>(null);
 
   // Новые сообщения — по WebSocket; изменения сбора — освежаем его карточку
   useEffect(
@@ -50,8 +50,10 @@ export function ChatView({ gatheringId, readOnly }: Props) {
     return [...older, ...live.filter((m) => !seen.has(m.id) && seen.add(m.id))];
   }, [history.data, live]);
 
+  // Новое сообщение — прокручиваем ленту чата вниз (только её, не страницу)
   useEffect(() => {
-    bottom.current?.scrollIntoView({ block: "end" });
+    const el = scroller.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [messages.length]);
 
   if (status === "forbidden" || (history.isError && history.error.status === 403)) {
@@ -69,13 +71,18 @@ export function ChatView({ gatheringId, readOnly }: Props) {
   };
 
   return (
-    <div className="flex min-h-[calc(100dvh-56px)] flex-col">
+    <div className="flex h-[calc(100dvh-180px)] flex-col overflow-hidden rounded-card bg-surface shadow-card md:h-[calc(100dvh-230px)]">
       {status === "closed" && (
-        <p role="status" className="bg-brand-100 px-4 py-2 text-center text-sm text-brand-800">
+        <p role="status" className="bg-sand-100 px-4 py-2 text-center text-sm text-sand-800">
           {t("chat.reconnecting")}
         </p>
       )}
-      <div className="flex-1 space-y-2 px-4 py-3" aria-live="polite" aria-relevant="additions">
+      <div
+        ref={scroller}
+        className="flex-1 space-y-2 overflow-y-auto bg-canvas px-4 py-4 md:px-6"
+        aria-live="polite"
+        aria-relevant="additions"
+      >
         {history.hasNextPage && (
           <Button
             variant="ghost"
@@ -94,7 +101,6 @@ export function ChatView({ gatheringId, readOnly }: Props) {
             <MessageBubble key={m.id} message={m} mine={m.author?.id === me.data?.id} />
           ),
         )}
-        <div ref={bottom} />
       </div>
       {readOnly ? (
         <p className="border-t border-line bg-surface px-4 py-4 text-center text-sm text-ink-muted">

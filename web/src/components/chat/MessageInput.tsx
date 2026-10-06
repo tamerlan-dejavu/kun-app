@@ -30,7 +30,7 @@ export function MessageInput({
 
   return (
     <form
-      className="sticky bottom-0 border-t border-line bg-surface px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
+      className="border-t border-line bg-surface px-3 py-3 md:px-4"
       onSubmit={(e) => {
         e.preventDefault();
         submit();
@@ -65,7 +65,7 @@ export function MessageInput({
           type="submit"
           aria-label={t("chat.send")}
           disabled={!text.trim() || pending}
-          className="flex h-tap w-11 shrink-0 items-center justify-center rounded-full bg-brand text-ink disabled:opacity-40"
+          className="flex h-tap w-11 shrink-0 items-center justify-center rounded-full bg-brand text-white disabled:opacity-40"
         >
           <Icon name="send" />
         </button>

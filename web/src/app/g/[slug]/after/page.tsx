@@ -1,12 +1,13 @@
+import { SiteShell } from "@/components/layout/SiteShell";
 import { AttendanceButton } from "@/components/after/AttendanceButton";
 import { RatingForm } from "@/components/after/RatingForm";
 
-// /g/<slug>/after — «Я пришёл» и оценки участников.
+// /g/<slug>/after — «Я пришёл» и оценки участников. TODO: экран.
 export default function AfterPage() {
   return (
-    <main className="mx-auto max-w-app p-4">
+    <SiteShell>
       <AttendanceButton />
       <RatingForm />
-    </main>
+    </SiteShell>
   );
 }

@@ -17,7 +17,7 @@ export function MyGatheringsList() {
 
   return (
     <>
-      <div role="group" aria-label={t("my.title")} className="flex gap-2 pb-3">
+      <div role="group" aria-label={t("my.title")} className="flex gap-2 pb-5">
         <Chip selected={when === "upcoming"} onClick={() => setWhen("upcoming")}>
           {t("my.upcoming")}
         </Chip>
@@ -35,7 +35,7 @@ export function MyGatheringsList() {
           action={when === "upcoming" && <ButtonLink href="/feed">{t("my.toFeed")}</ButtonLink>}
         />
       ) : (
-        <ul className="space-y-3">
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((g) => (
             <li key={g.id}>
               <GatheringCard g={g} />
@@ -44,7 +44,7 @@ export function MyGatheringsList() {
         </ul>
       )}
       {query.hasNextPage && (
-        <Button variant="secondary" block className="mt-4" onClick={() => query.fetchNextPage()}>
+        <Button variant="secondary" block className="mx-auto mt-6 max-w-sm" onClick={() => query.fetchNextPage()}>
           {t("common.more")}
         </Button>
       )}

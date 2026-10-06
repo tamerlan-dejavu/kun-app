@@ -21,12 +21,12 @@ export function GatheringHeader({ g }: { g: GatheringPublic }) {
       </Badge>
       <h1 className="mb-4 mt-3 text-2xl leading-tight">{g.title}</h1>
       <p className="mb-1.5 flex items-center gap-2">
-        <Icon name="calendar" className="h-5 w-5 text-brand-700" />
+        <Icon name="calendar" className="h-5 w-5 text-brand" />
         {formatStartsAt(g.starts_at)}
       </p>
       {g.district && (
         <p className="mb-4 flex items-center gap-2">
-          <Icon name="pin" className="h-5 w-5 text-brand-700" />
+          <Icon name="pin" className="h-5 w-5 text-brand" />
           {g.district}
         </p>
       )}

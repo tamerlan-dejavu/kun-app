@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { t } from "@/i18n";
-import { PageHeader } from "@/components/layout/PageHeader";
+import { PageTitle } from "@/components/layout/PageTitle";
 import { FeedList } from "@/components/gathering/FeedList";
 
 export const metadata: Metadata = { title: "Лента" };
@@ -9,10 +9,8 @@ export const metadata: Metadata = { title: "Лента" };
 export default function FeedPage() {
   return (
     <>
-      <PageHeader title={t("feed.title")} />
-      <div className="px-4">
-        <FeedList />
-      </div>
+      <PageTitle title={t("feed.title")} />
+      <FeedList />
     </>
   );
 }

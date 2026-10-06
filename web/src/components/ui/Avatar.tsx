@@ -16,7 +16,7 @@ export function Avatar({
     return <img src={photo} alt="" className={clsx(cls, "object-cover")} />;
   }
   return (
-    <span aria-hidden className={clsx(cls, "flex items-center justify-center bg-brand-100 font-semibold text-brand-800")}>
+    <span aria-hidden className={clsx(cls, "flex items-center justify-center bg-sand-100 font-semibold text-sand-800")}>
       {(name ?? "?").trim().charAt(0).toUpperCase() || "?"}
     </span>
   );

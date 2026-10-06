@@ -12,7 +12,7 @@ export function GatheringCard({ g }: { g: Card }) {
   return (
     <Link
       href={`/g/${g.slug}`}
-      className="block rounded-card bg-surface p-4 shadow-card transition-transform active:scale-[0.99]"
+      className="flex h-full flex-col rounded-card bg-surface p-5 shadow-card transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.99]"
     >
       <div className="mb-2 flex items-center justify-between gap-2">
         <Badge tone="brand">
@@ -35,7 +35,9 @@ export function GatheringCard({ g }: { g: Card }) {
         {[g.place_name, g.district].filter(Boolean).join(" · ")}
         {distance && <span className="ml-auto shrink-0">{distance}</span>}
       </p>
-      <SeatsMeter count={g.participants_count} seats={g.seats} />
+      <div className="mt-auto">
+        <SeatsMeter count={g.participants_count} seats={g.seats} />
+      </div>
     </Link>
   );
 }

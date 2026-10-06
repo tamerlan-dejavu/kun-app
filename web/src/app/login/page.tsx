@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { t } from "@/i18n";
 import { ButtonLink } from "@/components/ui/Button";
-import { PageHeader } from "@/components/layout/PageHeader";
+import { SiteShell } from "@/components/layout/SiteShell";
 
 export const metadata: Metadata = { title: "Вход" };
 
@@ -16,9 +16,9 @@ export default async function LoginPage({ searchParams }: Props) {
   const next = safeNext((await searchParams).next);
   const dev = process.env.NODE_ENV === "development";
   return (
-    <div className="mx-auto min-h-dvh max-w-app">
-      <PageHeader title={t("login.title")} backHref="/" />
-      <div className="space-y-4 px-4 pt-6">
+    <SiteShell>
+      <section className="mx-auto max-w-md space-y-4 rounded-card bg-surface p-8 shadow-card md:my-10">
+        <h1 className="text-2xl">{t("login.title")}</h1>
         <p className="text-ink-muted">{t("login.soon")}</p>
         {dev && (
           <>
@@ -28,7 +28,7 @@ export default async function LoginPage({ searchParams }: Props) {
             <p className="text-center text-sm text-ink-muted">{t("login.devHint")}</p>
           </>
         )}
-      </div>
-    </div>
+      </section>
+    </SiteShell>
   );
 }

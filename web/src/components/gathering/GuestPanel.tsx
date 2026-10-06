@@ -5,10 +5,8 @@ import { ShareButton } from "./ShareButton";
 // Гостю: без имён, фото и точного адреса (раздел 3.1 ТЗ).
 export function GuestPanel({ slug, title }: { slug: string; title: string }) {
   return (
-    <section className="mt-4 space-y-3">
-      <p className="rounded-card border border-dashed border-line p-4 text-center text-ink-muted">
-        {t("gathering.guestHidden")}
-      </p>
+    <section className="space-y-3 rounded-card bg-surface p-6 shadow-card">
+      <p className="text-ink-muted">{t("gathering.guestHidden")}</p>
       <ButtonLink href={`/login?next=/g/${slug}`} block>
         {t("gathering.loginToJoin")}
       </ButtonLink>

@@ -1,20 +1,30 @@
 import { t } from "@/i18n";
 import { ButtonLink } from "@/components/ui/Button";
+import { AppPreview } from "./AppPreview";
+import { Container } from "@/components/layout/Container";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden px-5 pb-10 pt-14">
-      {/* Место для маскота (ещё не выбран) */}
-      <div aria-hidden className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-brand-200" />
-      <div aria-hidden className="absolute -right-4 top-24 h-24 w-24 rounded-full bg-brand" />
-      <div className="relative">
-        <p className="mb-6 font-heading text-2xl text-brand-700">KUN</p>
-        <h1 className="mb-4 text-4xl leading-tight">{t("landing.title")}</h1>
-        <p className="mb-8 max-w-sm text-lg text-ink-muted">{t("landing.lead")}</p>
-        <ButtonLink href="/feed" block>
-          {t("common.start")}
-        </ButtonLink>
-      </div>
+    <section className="py-12 md:py-20">
+      <Container className="grid items-center gap-12 md:grid-cols-2 md:gap-16">
+        <div>
+          <p className="mb-5 inline-flex rounded-chip bg-sand-100 px-3 py-1.5 text-sm font-semibold text-sand-800">
+            {t("landing.eyebrow")}
+          </p>
+          <h1 className="mb-5 text-4xl leading-[1.1] md:text-6xl">{t("landing.title")}</h1>
+          <p className="mb-8 max-w-xl text-lg text-ink-muted md:text-xl">{t("landing.lead")}</p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <ButtonLink href="/feed" className="px-8 text-lg">
+              {t("common.start")}
+            </ButtonLink>
+            <ButtonLink href="#how" variant="secondary" className="px-8 text-lg">
+              {t("landing.ctaSecondary")}
+            </ButtonLink>
+          </div>
+          <p className="mt-6 max-w-md text-sm text-ink-muted">{t("landing.proof")}</p>
+        </div>
+        <AppPreview />
+      </Container>
     </section>
   );
 }
