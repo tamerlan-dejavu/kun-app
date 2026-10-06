@@ -1,4 +1,5 @@
 import ru from "./ru.json";
+import ruLanding from "./ru.landing.json";
 
 // Все строки — в файлах локализации; казахский (kk.json) добавится на этапе 2.
 const dictionaries = { ru } as const;
@@ -21,4 +22,11 @@ export function t(
   let text = typeof value === "string" ? value : key;
   for (const [k, v] of Object.entries(params ?? {})) text = text.replaceAll(`{${k}}`, String(v));
   return text;
+}
+
+// Структурированный контент лендинга (примеры карточек, категории) — отдельно от строк t()
+const landingContent = { ru: ruLanding } as const;
+
+export function landing(locale: Locale = "ru") {
+  return landingContent[locale];
 }

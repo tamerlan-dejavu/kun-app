@@ -65,7 +65,7 @@ export function MessageInput({
           type="submit"
           aria-label={t("chat.send")}
           disabled={!text.trim() || pending}
-          className="flex h-tap w-11 shrink-0 items-center justify-center rounded-full bg-brand text-ink disabled:opacity-40"
+          className="flex h-tap w-11 shrink-0 items-center justify-center rounded-full bg-brand text-white disabled:opacity-40"
         >
           <Icon name="send" />
         </button>

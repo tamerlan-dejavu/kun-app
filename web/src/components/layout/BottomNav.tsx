@@ -29,7 +29,7 @@ export function BottomNav() {
                 aria-current={active ? "page" : undefined}
                 className={clsx(
                   "flex min-h-tap min-w-[72px] flex-col items-center gap-0.5 px-3 py-2 text-xs font-semibold",
-                  active ? "text-brand-700" : "text-ink-muted",
+                  active ? "text-brand" : "text-ink-muted",
                 )}
               >
                 <Icon name={item.icon} />

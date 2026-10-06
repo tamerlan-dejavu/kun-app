@@ -71,7 +71,7 @@ export function ChatView({ gatheringId, readOnly }: Props) {
   return (
     <div className="flex min-h-[calc(100dvh-56px)] flex-col">
       {status === "closed" && (
-        <p role="status" className="bg-brand-100 px-4 py-2 text-center text-sm text-brand-800">
+        <p role="status" className="bg-sand-100 px-4 py-2 text-center text-sm text-sand-800">
           {t("chat.reconnecting")}
         </p>
       )}

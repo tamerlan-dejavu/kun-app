@@ -18,7 +18,7 @@ export function PageHeader({
         <Link
           href={backHref}
           aria-label={t("common.back")}
-          className="flex h-tap w-11 items-center justify-center rounded-full hover:bg-brand-50"
+          className="flex h-tap w-11 items-center justify-center rounded-full hover:bg-sand-50"
         >
           <Icon name="back" />
         </Link>

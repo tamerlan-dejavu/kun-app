@@ -2,7 +2,8 @@ import clsx from "clsx";
 import type { ReactNode } from "react";
 
 const tones = {
-  brand: "bg-brand-100 text-brand-800",
+  brand: "bg-brand-50 text-brand-700",
+  sand: "bg-sand-100 text-sand-800",
   neutral: "bg-line/70 text-ink-muted",
   success: "bg-green-50 text-success",
   danger: "bg-red-50 text-danger",

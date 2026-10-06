@@ -9,7 +9,7 @@ export function SeatsMeter({ count, seats }: { count: number; seats: number }) {
         {Array.from({ length: seats }, (_, i) => (
           <span
             key={i}
-            className={clsx("h-2.5 w-2.5 rounded-full", i < count ? "bg-brand-600" : "bg-line")}
+            className={clsx("h-2.5 w-2.5 rounded-full", i < count ? "bg-brand" : "bg-line")}
           />
         ))}
       </span>

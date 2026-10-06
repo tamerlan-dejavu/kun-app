@@ -38,7 +38,7 @@ export function MemberPanel({ id }: { id: number }) {
   return (
     <div className="mt-4 space-y-4">
       {g.moderation_status === "pending" && (
-        <p className="rounded-card bg-brand-100 p-4 text-sm text-brand-800">{t("gathering.pending")}</p>
+        <p className="rounded-card bg-sand-100 p-4 text-sm text-sand-800">{t("gathering.pending")}</p>
       )}
 
       <section className="space-y-3 rounded-card bg-surface p-5 shadow-card">

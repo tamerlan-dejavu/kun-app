@@ -21,7 +21,7 @@ export function Chip({
       className={clsx(
         "inline-flex min-h-tap shrink-0 items-center gap-1.5 rounded-chip border px-4 text-sm font-semibold transition-colors",
         selected
-          ? "border-brand bg-brand text-ink"
+          ? "border-brand bg-brand text-white"
           : "border-line bg-surface text-ink-muted hover:text-ink",
       )}
     >

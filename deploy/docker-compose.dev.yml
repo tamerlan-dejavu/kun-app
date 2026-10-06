@@ -11,6 +11,10 @@ services:
       context: ../web
       target: deps          # стадия с node_modules; исходники монтируются томом
     command: npm run dev
+    environment:
+      # Docker Desktop (Windows/macOS) не передаёт в контейнер события изменения файлов —
+      # без опроса Next.js не видит правки и отдаёт старую сборку
+      WATCHPACK_POLLING: "true"
     volumes:
       - ../web:/app
       - /app/node_modules   # node_modules из образа, а не с хоста

@@ -12,7 +12,7 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
-      <div aria-hidden className="mb-2 h-20 w-20 rounded-full bg-brand-100" />
+      <div aria-hidden className="mb-2 h-20 w-20 rounded-full bg-sand-100" />
       <p className="font-heading text-lg">{title}</p>
       {hint && <p className="text-ink-muted">{hint}</p>}
       {action}
