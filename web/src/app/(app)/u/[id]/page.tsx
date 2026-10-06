@@ -1,13 +1,6 @@
-import { ProfileActions } from "@/components/profile/ProfileActions";
-import { ProfileCard } from "@/components/profile/ProfileCard";
+import { SoonPage } from "@/components/layout/SoonPage";
 
-// /u/<id> — чужой профиль.
-export default async function UserProfilePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id: _id } = await params;
-  return (
-    <>
-      <ProfileCard />
-      <ProfileActions />
-    </>
-  );
+// /u/<id> — чужой профиль. Ждёт GET /users/{id} (публичный профиль без телефона).
+export default function UserProfilePage() {
+  return <SoonPage title="Профиль" />;
 }

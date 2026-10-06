@@ -11,6 +11,7 @@ api_v1 = [
     path("", include("apps.notifications.urls")),
     path("", include("apps.moderation.urls")),
     path("", include("apps.places.urls")),
+    path("", include("apps.catalog.urls")),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path("docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger"),
 ]

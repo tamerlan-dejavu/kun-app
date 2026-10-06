@@ -8,9 +8,13 @@ export function Avatar({
 }: {
   name?: string | null;
   photo?: string | null;
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
 }) {
-  const cls = clsx("shrink-0 rounded-full", size === "sm" ? "h-8 w-8 text-sm" : "h-11 w-11");
+  const cls = clsx("shrink-0 rounded-full", {
+    "h-8 w-8 text-sm": size === "sm",
+    "h-11 w-11": size === "md",
+    "h-24 w-24 text-3xl": size === "lg",
+  });
   if (photo) {
     // eslint-disable-next-line @next/next/no-img-element -- фото с бэкенда/S3, размер известен
     return <img src={photo} alt="" className={clsx(cls, "object-cover")} />;

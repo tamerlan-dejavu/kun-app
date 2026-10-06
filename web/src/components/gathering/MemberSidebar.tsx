@@ -20,6 +20,7 @@ export function MemberSidebar({ id }: { id: number }) {
 
   const g = query.data;
   const active = g.status === "open" || g.status === "full";
+  const started = new Date(g.starts_at) <= new Date() && g.status !== "cancelled";
   const leave = () => {
     if (window.confirm(t("gathering.leaveConfirm"))) participation.mutate("leave");
   };
@@ -38,11 +39,19 @@ export function MemberSidebar({ id }: { id: number }) {
               <Icon name="check" />
               {t("gathering.joined")}
             </p>
-            <Link href={`/g/${g.slug}/chat`} className={buttonClass("primary", true)}>
+            {started && (
+              <Link href={`/g/${g.slug}/after`} className={buttonClass("primary", true)}>
+                {t("gathering.howWasIt")}
+              </Link>
+            )}
+            <Link
+              href={`/g/${g.slug}/chat`}
+              className={buttonClass(started ? "secondary" : "primary", true)}
+            >
               <Icon name="chat" />
               {t("gathering.chat")}
             </Link>
-            {active && (
+            {active && !started && (
               <Button variant="danger" block onClick={leave} disabled={participation.isPending}>
                 {t("gathering.leave")}
               </Button>

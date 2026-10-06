@@ -4,16 +4,11 @@ from rest_framework import serializers
 
 from apps.accounts.models import User
 from apps.catalog.models import Category
+from apps.catalog.serializers import CategorySerializer
 
 from .models import SEATS_MAX, SEATS_MIN, Gathering, Rating
 
 # --- вложенные -------------------------------------------------------------------------------
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ["slug", "name", "emoji"]
 
 
 class UserShortSerializer(serializers.ModelSerializer):
@@ -73,6 +68,10 @@ class GatheringDetailSerializer(GatheringListSerializer):
     creator = UserShortSerializer()
     participants = serializers.SerializerMethodField()
     is_creator = serializers.SerializerMethodField()
+    attended = serializers.SerializerMethodField(help_text="я уже отметил «Я пришёл»")
+    my_ratings = serializers.SerializerMethodField(
+        help_text="мои оценки: {user_id: ok | no_show}; чужие оценки не отдаются"
+    )
 
     class Meta(GatheringListSerializer.Meta):
         fields = [
@@ -84,6 +83,8 @@ class GatheringDetailSerializer(GatheringListSerializer):
             "lng",
             "creator",
             "is_creator",
+            "attended",
+            "my_ratings",
             "participants",
             "moderation_status",
             "cancel_reason",
@@ -103,6 +104,25 @@ class GatheringDetailSerializer(GatheringListSerializer):
     def get_is_creator(self, obj):
         request = self.context.get("request")
         return bool(request and obj.creator_id == request.user.pk)
+
+    @extend_schema_field(serializers.BooleanField())
+    def get_attended(self, obj):
+        user = self._user()
+        return bool(user) and obj.attendances.filter(user=user).exists()
+
+    @extend_schema_field(serializers.DictField(child=serializers.CharField()))
+    def get_my_ratings(self, obj):
+        user = self._user()
+        if not user:
+            return {}
+        return {
+            str(ratee): value
+            for ratee, value in obj.ratings.filter(rater=user).values_list("ratee_id", "value")
+        }
+
+    def _user(self):
+        request = self.context.get("request")
+        return request.user if request and request.user.is_authenticated else None
 
     @extend_schema_field(ParticipantSerializer(many=True))
     def get_participants(self, obj):

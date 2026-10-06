@@ -1,3 +1,15 @@
-from rest_framework import serializers  # noqa: F401
+from rest_framework import serializers
 
-# TODO: CategorySerializer, InterestSerializer
+from .models import Category, Interest
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["slug", "name", "emoji"]
+
+
+class InterestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Interest
+        fields = ["slug", "name"]

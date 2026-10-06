@@ -89,6 +89,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/catalog/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Категории сборов
+         * @description GET /catalog/categories — активные категории сборов (фильтр ленты, создание сбора).
+         */
+        get: operations["catalog_categories_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/interests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Интересы
+         * @description GET /catalog/interests — интересы для профиля (онбординг).
+         */
+        get: operations["catalog_interests_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/gatherings": {
         parameters: {
             query?: never;
@@ -571,6 +611,12 @@ export interface components {
             readonly lng: number;
             creator: components["schemas"]["UserShort"];
             readonly is_creator: boolean;
+            /** @description я уже отметил «Я пришёл» */
+            readonly attended: boolean;
+            /** @description мои оценки: {user_id: ok | no_show}; чужие оценки не отдаются */
+            readonly my_ratings: {
+                [key: string]: string;
+            };
             readonly participants: components["schemas"]["Participant"][];
             /** Модерация */
             moderation_status?: components["schemas"]["ModerationStatusEnum"];
@@ -632,6 +678,12 @@ export interface components {
             participants_count: number;
             /** Статус */
             status?: components["schemas"]["StatusEnum"];
+        };
+        Interest: {
+            /** Код */
+            slug: string;
+            /** Название */
+            name: string;
         };
         /**
          * @description * `user` - Сообщение участника
@@ -898,6 +950,44 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    catalog_categories_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Category"][];
+                };
+            };
+        };
+    };
+    catalog_interests_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Interest"][];
+                };
             };
         };
     };
