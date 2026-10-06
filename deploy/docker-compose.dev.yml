@@ -14,6 +14,7 @@ services:
     volumes:
       - ../web:/app
       - /app/node_modules   # node_modules из образа, а не с хоста
+      - /app/.next          # свой .next: `npm run build` на хосте не ломает dev-сервер
 
   api:
     build:
