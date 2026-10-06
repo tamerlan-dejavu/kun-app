@@ -1,5 +1,5 @@
 import { t } from "@/i18n";
-import { Container } from "./Container";
+import { Container } from "@/components/layout/Container";
 
 const STEPS = [
   ["landing.step1Title", "landing.step1Text"],

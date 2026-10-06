@@ -3,10 +3,12 @@ import { notFound } from "next/navigation";
 import { t } from "@/i18n";
 import { getPublicGathering, hasSession } from "@/lib/api/server";
 import { formatStartsAt } from "@/lib/datetime";
-import { PageHeader } from "@/components/layout/PageHeader";
+import { PageTitle } from "@/components/layout/PageTitle";
+import { SiteShell } from "@/components/layout/SiteShell";
 import { GatheringHeader } from "@/components/gathering/GatheringHeader";
 import { GuestPanel } from "@/components/gathering/GuestPanel";
-import { MemberPanel } from "@/components/gathering/MemberPanel";
+import { MemberDetails } from "@/components/gathering/MemberDetails";
+import { MemberSidebar } from "@/components/gathering/MemberSidebar";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -28,19 +30,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// /g/<slug>: шапка рендерится на сервере для всех; дальше — гостю или участнику
+// /g/<slug>: шапка сбора — на сервере для всех; на десктопе две колонки
 export default async function GatheringPage({ params }: Props) {
   const { slug } = await params;
   const [g, loggedIn] = await Promise.all([getPublicGathering(slug), hasSession()]);
   if (!g) notFound();
 
   return (
-    <>
-      <PageHeader title={g.category.name} backHref={loggedIn ? "/feed" : "/"} />
-      <div className="px-4 pb-10">
-        <GatheringHeader g={g} />
-        {loggedIn ? <MemberPanel id={g.id} /> : <GuestPanel slug={g.slug} title={g.title} />}
+    <SiteShell>
+      <PageTitle title={g.category.name} backHref={loggedIn ? "/feed" : "/"} />
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
+        <div className="space-y-6">
+          <GatheringHeader g={g} />
+          {loggedIn && <MemberDetails id={g.id} />}
+        </div>
+        <aside className="lg:sticky lg:top-24">
+          {loggedIn ? <MemberSidebar id={g.id} /> : <GuestPanel slug={g.slug} title={g.title} />}
+        </aside>
       </div>
-    </>
+    </SiteShell>
   );
 }

@@ -4,12 +4,13 @@ import { buttonClass } from "@/components/ui/Button";
 import { Container } from "./Container";
 
 const LINKS = [
-  { href: "#how", label: "landing.navHow" },
-  { href: "#where", label: "landing.navWhere" },
-  { href: "#safety", label: "landing.navSafety" },
+  { href: "/#how", label: "landing.navHow" },
+  { href: "/#where", label: "landing.navWhere" },
+  { href: "/#safety", label: "landing.navSafety" },
 ] as const;
 
-export function SiteHeader() {
+// Шапка для гостя: разделы лендинга, «Войти» и «Начать».
+export function GuestHeader() {
   return (
     <header className="sticky top-0 z-20 border-b border-line/70 bg-canvas/90 backdrop-blur">
       <Container className="flex h-16 items-center gap-6">
@@ -18,9 +19,9 @@ export function SiteHeader() {
         </Link>
         <nav aria-label={t("landing.nav")} className="hidden flex-1 gap-6 md:flex">
           {LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="text-sm font-semibold text-ink-muted hover:text-ink">
+            <Link key={l.href} href={l.href} className="text-sm font-semibold text-ink-muted hover:text-ink">
               {t(l.label)}
-            </a>
+            </Link>
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">

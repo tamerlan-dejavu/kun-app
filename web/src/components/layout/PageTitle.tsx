@@ -3,7 +3,8 @@ import type { ReactNode } from "react";
 import { t } from "@/i18n";
 import { Icon } from "@/components/ui/Icon";
 
-export function PageHeader({
+// Заголовок страницы: «назад», h1, действие справа.
+export function PageTitle({
   title,
   backHref,
   action,
@@ -13,20 +14,18 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <header className="sticky top-0 z-10 flex min-h-[56px] items-center gap-2 bg-canvas/95 px-2 backdrop-blur">
-      {backHref ? (
+    <div className="mb-6 flex items-center gap-3 md:mb-8">
+      {backHref && (
         <Link
           href={backHref}
           aria-label={t("common.back")}
-          className="flex h-tap w-11 items-center justify-center rounded-full hover:bg-sand-50"
+          className="-ml-2 flex h-tap w-11 shrink-0 items-center justify-center rounded-full hover:bg-sand-50"
         >
           <Icon name="back" />
         </Link>
-      ) : (
-        <span className="w-2" />
       )}
-      <h1 className="min-w-0 flex-1 truncate text-lg">{title}</h1>
+      <h1 className="min-w-0 flex-1 truncate text-2xl md:text-4xl">{title}</h1>
       {action}
-    </header>
+    </div>
   );
 }

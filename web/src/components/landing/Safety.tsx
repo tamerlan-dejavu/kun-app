@@ -1,6 +1,6 @@
 import { t } from "@/i18n";
 import { Icon } from "@/components/ui/Icon";
-import { Container } from "./Container";
+import { Container } from "@/components/layout/Container";
 
 const POINTS = [
   ["landing.safety1Title", "landing.safety1"],

@@ -1,5 +1,5 @@
 import { landing, t } from "@/i18n";
-import { Container } from "./Container";
+import { Container } from "@/components/layout/Container";
 
 export function Categories() {
   return (

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { t } from "@/i18n";
-import { PageHeader } from "@/components/layout/PageHeader";
+import { PageTitle } from "@/components/layout/PageTitle";
 import { MyGatheringsList } from "@/components/gathering/MyGatheringsList";
 
 export const metadata: Metadata = { title: "Мои сборы" };
@@ -9,10 +9,8 @@ export const metadata: Metadata = { title: "Мои сборы" };
 export default function MyGatheringsPage() {
   return (
     <>
-      <PageHeader title={t("my.title")} />
-      <div className="px-4">
-        <MyGatheringsList />
-      </div>
+      <PageTitle title={t("my.title")} />
+      <MyGatheringsList />
     </>
   );
 }

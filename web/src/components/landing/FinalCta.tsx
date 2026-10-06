@@ -1,6 +1,6 @@
 import { t } from "@/i18n";
 import { ButtonLink } from "@/components/ui/Button";
-import { Container } from "./Container";
+import { Container } from "@/components/layout/Container";
 
 export function FinalCta() {
   return (

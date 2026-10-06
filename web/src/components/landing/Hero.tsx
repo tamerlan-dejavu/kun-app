@@ -1,7 +1,7 @@
 import { t } from "@/i18n";
 import { ButtonLink } from "@/components/ui/Button";
 import { AppPreview } from "./AppPreview";
-import { Container } from "./Container";
+import { Container } from "@/components/layout/Container";
 
 export function Hero() {
   return (

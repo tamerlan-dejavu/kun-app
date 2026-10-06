@@ -43,7 +43,7 @@ export function FeedList() {
       <div
         role="group"
         aria-label={t("feed.dateFilter")}
-        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-3"
+        className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-5 md:mx-0 md:flex-wrap md:overflow-visible md:px-0"
       >
         {DATES.map((d) => (
           <Chip
@@ -82,7 +82,7 @@ export function FeedList() {
           }
         />
       ) : (
-        <ul className="space-y-3">
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((g) => (
             <li key={g.id}>
               <GatheringCard g={g} />
@@ -95,7 +95,7 @@ export function FeedList() {
         <Button
           variant="secondary"
           block
-          className="mt-4"
+          className="mx-auto mt-6 max-w-sm"
           disabled={feed.isFetchingNextPage}
           onClick={() => feed.fetchNextPage()}
         >
