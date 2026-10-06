@@ -1,11 +1,20 @@
 import type { ReactNode } from "react";
 
-// Состояние «пусто» с подсказкой, что делать. Место для маскота.
-export function EmptyState({ title, action }: { title: string; action?: ReactNode }) {
+// Состояние «пусто» с подсказкой, что делать. Место для маскота (ещё не выбран).
+export function EmptyState({
+  title,
+  hint,
+  action,
+}: {
+  title: string;
+  hint?: string;
+  action?: ReactNode;
+}) {
   return (
-    <div className="flex flex-col items-center gap-4 py-12 text-center">
-      {/* TODO: маскот */}
-      <p>{title}</p>
+    <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
+      <div aria-hidden className="mb-2 h-20 w-20 rounded-full bg-brand-100" />
+      <p className="font-heading text-lg">{title}</p>
+      {hint && <p className="text-ink-muted">{hint}</p>}
       {action}
     </div>
   );

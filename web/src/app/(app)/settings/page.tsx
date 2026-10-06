@@ -1,16 +1,6 @@
-import { DeleteAccount } from "@/components/settings/DeleteAccount";
-import { NotificationToggles } from "@/components/settings/NotificationToggles";
-import { PushConnect } from "@/components/settings/PushConnect";
-import { TelegramConnect } from "@/components/settings/TelegramConnect";
+import { SoonPage } from "@/components/layout/SoonPage";
 
-// /settings — уведомления, Telegram, удаление аккаунта.
+// /settings — уведомления, Telegram, удаление аккаунта. Вместе с эндпоинтами настроек.
 export default function SettingsPage() {
-  return (
-    <div className="space-y-6 p-4">
-      <NotificationToggles />
-      <PushConnect />
-      <TelegramConnect />
-      <DeleteAccount />
-    </div>
-  );
+  return <SoonPage title="Настройки" />;
 }

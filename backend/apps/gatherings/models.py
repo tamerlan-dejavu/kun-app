@@ -76,6 +76,19 @@ class Gathering(TimeStampedModel):
     cancel_reason = models.CharField("причина отмены", max_length=300, blank=True)
     cancelled_at = models.DateTimeField("отменён", null=True, blank=True)
 
+    # Отметки фоновых задач (Celery) — чтобы не слать повторно и подводить итог один раз
+    reminder_sent_at = models.DateTimeField("напоминание отправлено", null=True, blank=True)
+    after_prompt_sent_at = models.DateTimeField(
+        "«Как прошла встреча?» отправлено", null=True, blank=True
+    )
+    happened = models.BooleanField(
+        "состоялся",
+        null=True,
+        blank=True,
+        db_comment="итог через 12 ч после начала: >= 2 отметок «Я пришёл»; NULL — ещё не подведён",
+    )
+    settled_at = models.DateTimeField("итог подведён", null=True, blank=True)
+
     participants = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         through="Participation",

@@ -18,6 +18,7 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     phone = factory.Sequence(lambda n: f"+7701{n:07d}")
     name = factory.Faker("first_name", locale="ru_RU")
+    onboarding_completed_at = factory.LazyFunction(timezone.now)
 
 
 class CategoryFactory(factory.django.DjangoModelFactory):

@@ -1,6 +1,7 @@
-import { ProfileCard } from "@/components/profile/ProfileCard";
+import { t } from "@/i18n";
+import { SoonPage } from "@/components/layout/SoonPage";
 
-// /profile — свой профиль.
+// /profile — свой профиль. Вместе с входом и онбордингом.
 export default function MyProfilePage() {
-  return <ProfileCard />;
+  return <SoonPage title={t("nav.profile")} />;
 }

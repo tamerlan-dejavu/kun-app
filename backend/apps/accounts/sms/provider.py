@@ -2,4 +2,4 @@
 
 
 def send(phone: str, text: str) -> None:
-    raise NotImplementedError
+    raise NotImplementedError("SMS-провайдер ещё не выбран: SMS_BACKEND=console для dev")

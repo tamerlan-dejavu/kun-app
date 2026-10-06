@@ -22,6 +22,8 @@ from apps.notifications.models import NotificationSettings, TelegramLink
 from apps.universities.models import University
 
 DEMO_PHONE_PREFIX = "+7700000"
+# Только для dev-входа на /api/v1/auth/dev/login/ (в prod входа по паролю нет)
+DEMO_PASSWORD = "kun-demo"
 
 NAMES = [
     "Айгерим", "Данияр", "Алина", "Тимур", "Мадина", "Арман", "Камила",
@@ -94,6 +96,10 @@ class Command(BaseCommand):
                 f"{Message.objects.count()} сообщений"
             )
         )
+        self.stdout.write(
+            f"Вход: /api/v1/auth/dev/login/ — {users[1].phone} / {DEMO_PASSWORD} "
+            f"(модератор: {users[0].phone})"
+        )
 
     def _users(self):
         interests = list(Interest.objects.all())
@@ -104,6 +110,7 @@ class Command(BaseCommand):
             joined = now - timedelta(days=random.randint(3, 40))
             user = User.objects.create_user(
                 phone=f"{DEMO_PHONE_PREFIX}{i:04d}",
+                password=DEMO_PASSWORD,
                 name=name,
                 university=random.choice(universities) if i % 3 else None,
                 role=User.Role.MODERATOR if i == 0 else User.Role.USER,
