@@ -155,6 +155,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/for-you": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Для тебя: персональный подбор
+         * @description GET /for-you — 5–10 сборов на сегодня и ближайшие дни с объяснением «почему».
+         */
+        get: operations["for_you_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/gatherings": {
         parameters: {
             query?: never;
@@ -663,6 +683,22 @@ export interface components {
             places: components["schemas"]["CityPlace"][];
             points: components["schemas"]["CityPoint"][];
         };
+        /**
+         * @description * `together` - together
+         *     * `attended` - attended
+         *     * `interest` - interest
+         *     * `common` - common
+         *     * `time_habit` - time_habit
+         *     * `near` - near
+         *     * `popular` - popular
+         *     * `fresh` - fresh
+         * @enum {string}
+         */
+        CodeEnum: "together" | "attended" | "interest" | "common" | "time_habit" | "near" | "popular" | "fresh";
+        ForYouItem: {
+            gathering: components["schemas"]["GatheringList"];
+            reason: components["schemas"]["Reason"];
+        };
         /** @description Место из поиска 2ГИС: координаты приходят отдельными полями, в БД — PointField. */
         GatheringCreateRequest: {
             /** Код */
@@ -807,6 +843,18 @@ export interface components {
             slug: string;
             /** Название */
             name: string;
+        };
+        JoinRequest: {
+            /**
+             * @description откуда пришёл — для метрики «Для тебя»
+             *
+             *     * `feed` - Лента
+             *     * `for_you` - Для тебя
+             *     * `map` - Карта
+             *     * `link` - Ссылка / другое
+             * @default link
+             */
+            source: components["schemas"]["SourceEnum"];
         };
         /**
          * @description * `user` - Сообщение участника
@@ -978,6 +1026,25 @@ export interface components {
         RatingsRequest: {
             ratings: components["schemas"]["RatingItemRequest"][];
         };
+        Reason: {
+            /**
+             * @description почему советуем; текст строит клиент из code и params
+             *
+             *     * `together` - together
+             *     * `attended` - attended
+             *     * `interest` - interest
+             *     * `common` - common
+             *     * `time_habit` - time_habit
+             *     * `near` - near
+             *     * `popular` - popular
+             *     * `fresh` - fresh
+             */
+            code: components["schemas"]["CodeEnum"];
+            /** @description name, n, category, interest, bucket, km */
+            params: {
+                [key: string]: unknown;
+            };
+        };
         /**
          * @description * `spam` - Спам или реклама
          *     * `harassment` - Оскорбления, травля
@@ -1022,6 +1089,14 @@ export interface components {
          * @enum {string}
          */
         RoleEnum: "user" | "moderator" | "admin";
+        /**
+         * @description * `feed` - Лента
+         *     * `for_you` - Для тебя
+         *     * `map` - Карта
+         *     * `link` - Ссылка / другое
+         * @enum {string}
+         */
+        SourceEnum: "feed" | "for_you" | "map" | "link";
         /**
          * @description * `open` - Набор открыт
          *     * `full` - Мест нет
@@ -1237,6 +1312,38 @@ export interface operations {
             };
         };
     };
+    for_you_list: {
+        parameters: {
+            query?: {
+                /** @description slug категории */
+                category?: string;
+                /**
+                 * @description по календарю Алматы
+                 *
+                 *     * `today` - today
+                 *     * `tomorrow` - tomorrow
+                 *     * `week` - week
+                 */
+                date?: "today" | "tomorrow" | "week";
+                lat?: number;
+                lng?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ForYouItem"][];
+                };
+            };
+        };
+    };
     gatherings_list: {
         parameters: {
             query?: {
@@ -1400,7 +1507,13 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["JoinRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["JoinRequest"];
+                "multipart/form-data": components["schemas"]["JoinRequest"];
+            };
+        };
         responses: {
             200: {
                 headers: {

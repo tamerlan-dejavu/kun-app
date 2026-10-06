@@ -32,7 +32,7 @@ const MOUNTAINS: [number, number][] = [
 
 const CENTER = { lat: 43.2389, lng: 76.8897 };
 
-export function CityMap({ points, label }: { points: MapPoint[]; label: string }) {
+export function CityMap({ points, label, src }: { points: MapPoint[]; label: string; src?: "map" }) {
   // Точки в одной клетке (огрублённые координаты) слегка разводим, чтобы не слипались
   const seen = new Map<string, number>();
   const placed = points.map((p) => {
@@ -91,7 +91,7 @@ export function CityMap({ points, label }: { points: MapPoint[]; label: string }
       </g>
 
       {placed.map((p) => (
-        <Link key={p.slug} href={`/g/${p.slug}`} aria-label={p.title}>
+        <Link key={p.slug} href={src ? `/g/${p.slug}?src=${src}` : `/g/${p.slug}`} aria-label={p.title}>
           <title>{p.title}</title>
           <g className="transition-transform duration-100 hover:-translate-y-1">
             <rect x={p.cx - 11} y={p.cy - 11} width="22" height="22" fill="#111" transform="translate(4 4)" />

@@ -11,6 +11,7 @@ import { Container } from "./Container";
 import { Coords, Logo } from "./Brand";
 
 const LINKS = [
+  { href: "/for-you", label: "nav.forYou" },
   { href: "/feed", label: "nav.feed" },
   { href: "/map", label: "nav.map" },
   { href: "/my", label: "nav.my" },

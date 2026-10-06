@@ -2,14 +2,15 @@ import Link from "next/link";
 import { t } from "@/i18n";
 import type { GatheringCard as Card } from "@/lib/api/types";
 import { formatDistance, formatStartsAt } from "@/lib/datetime";
+import { gatheringHref, type Source } from "@/lib/source";
 import { Badge } from "@/components/ui/Badge";
 import { SeatsMeter } from "./SeatsMeter";
 
 // Карточка в ленте: категория, название, время, район, «идут N из M» (раздел 3.3 ТЗ).
-export function GatheringCard({ g }: { g: Card }) {
+export function GatheringCard({ g, src }: { g: Card; src?: Source }) {
   const distance = formatDistance(g.distance_m);
   return (
-    <Link href={`/g/${g.slug}`} className="card-link flex h-full flex-col">
+    <Link href={gatheringHref(g.slug, src)} className="card-link flex h-full flex-col">
       <div className="flex items-center justify-between gap-2 border-b-2 border-ink px-4 py-2.5">
         <span className="meta font-bold">
           <span aria-hidden>{g.category.emoji}</span> {g.category.name}

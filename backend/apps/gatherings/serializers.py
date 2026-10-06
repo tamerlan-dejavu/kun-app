@@ -6,7 +6,7 @@ from apps.accounts.models import User
 from apps.catalog.models import Category
 from apps.catalog.serializers import CategorySerializer
 
-from .models import SEATS_MAX, SEATS_MIN, Gathering, Rating
+from .models import SEATS_MAX, SEATS_MIN, Gathering, Participation, Rating
 
 # --- вложенные -------------------------------------------------------------------------------
 
@@ -306,3 +306,36 @@ class CitySnapshotSerializer(serializers.Serializer):
     people = CityPeopleSerializer(many=True)
     places = CityPlaceSerializer(many=True)
     points = CityPointSerializer(many=True)
+
+
+class JoinSerializer(serializers.Serializer):
+    source = serializers.ChoiceField(
+        choices=Participation.Source.choices,
+        default=Participation.Source.LINK,
+        help_text="откуда пришёл — для метрики «Для тебя»",
+    )
+
+
+# --- «Для тебя» -------------------------------------------------------------------------------
+
+
+class ReasonSerializer(serializers.Serializer):
+    code = serializers.ChoiceField(
+        choices=[
+            "together",
+            "attended",
+            "interest",
+            "common",
+            "time_habit",
+            "near",
+            "popular",
+            "fresh",
+        ],
+        help_text="почему советуем; текст строит клиент из code и params",
+    )
+    params = serializers.DictField(help_text="name, n, category, interest, bucket, km")
+
+
+class ForYouItemSerializer(serializers.Serializer):
+    gathering = GatheringListSerializer()
+    reason = ReasonSerializer()

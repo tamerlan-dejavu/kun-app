@@ -16,6 +16,7 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.catalog.models import Category, Interest
 from apps.chat.models import Message
+from apps.common.time import ALMATY
 from apps.gatherings.models import Attendance, Gathering, Participation, Rating
 from apps.moderation.models import BannedWord, Block, ModerationLog, Report, UserSanction
 from apps.notifications.models import NotificationSettings, TelegramLink
@@ -63,6 +64,31 @@ GATHERINGS = [
     ("study", "Готовимся к сессии", "Матан, берите конспекты", -120, 3, "finished", "published"),
 ]
 
+# --more: ещё сборы на неделю вперёд в разное время суток — чтобы «Для тебя» было из чего выбирать
+# (категория, название, через сколько часов, мест, час начала по Алматы)
+MORE_GATHERINGS = [
+    ("board-games", "Мафия в антикафе", 6, 8, 19),
+    ("cinema", "Вечерний сеанс в Арман", 30, 4, 20),
+    ("coffee", "Утренний кофе перед парами", 40, 3, 9),
+    ("walk", "Прогулка по Терренкуру", 52, 5, 18),
+    ("sport", "Утренняя пробежка в парке", 64, 6, 7),
+    ("board-games", "Каркассон и чай", 76, 4, 20),
+    ("concert", "Стендап-открытый микрофон", 88, 5, 21),
+    ("study", "Учим английский вместе", 100, 4, 15),
+    ("food", "Бешбармак в старом городе", 112, 4, 19),
+    ("club", "Клуб любителей книг", 124, 6, 18),
+    ("cinema", "Ретро-кинопоказ во дворе", 136, 6, 21),
+    ("walk", "Фотопрогулка по Арбату", 148, 5, 12),
+]
+
+# --more: прошедшие встречи — история «Я пришёл» (категории, время, знакомые)
+# (категория, название, сколько дней назад, час начала, индексы участников-демо)
+MORE_HISTORY = [
+    ("board-games", "Настолки в пятницу", 6, 20, [2, 3, 5]),
+    ("cinema", "Ночной сеанс", 13, 21, [2, 3, 7]),
+    ("board-games", "Манчкин для новичков", 20, 19, [2, 5, 8]),
+]
+
 CHAT_LINES = [
     "Привет всем! Я буду в серой куртке",
     "Отлично, увидимся у входа",
@@ -75,9 +101,18 @@ CHAT_LINES = [
 class Command(BaseCommand):
     help = "Заполнить БД демо-данными (только DEBUG)"
 
-    def handle(self, *args, **options):
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--more",
+            action="store_true",
+            help="дописать к существующим демо-данным сборы на неделю и историю встреч",
+        )
+
+    def handle(self, *args, more=False, **options):
         if not settings.DEBUG:
             raise CommandError("seed_demo только для локальной разработки (DEBUG=True)")
+        if more:
+            return self._more()
         if User.objects.filter(phone__startswith=DEMO_PHONE_PREFIX).exists():
             self.stdout.write(
                 self.style.WARNING("Демо-данные уже есть. Чистый старт: make reset-db")
@@ -245,4 +280,74 @@ class Command(BaseCommand):
             target_type="user",
             target_id=offender.pk,
             reason=sanction.reason,
+        )
+
+    def _more(self):
+        users = list(User.objects.filter(phone__startswith=DEMO_PHONE_PREFIX).order_by("phone"))
+        if not users:
+            raise CommandError("Сначала: manage.py seed_demo")
+        if Gathering.objects.filter(title=MORE_GATHERINGS[0][1]).exists():
+            self.stdout.write(self.style.WARNING("--more уже применялся"))
+            return
+
+        random.seed(7)
+        categories = {c.slug: c for c in Category.objects.all()}
+        # Часы в списках — по Алматы (TIME_ZONE проекта — UTC, localtime() дал бы UTC)
+        now = timezone.now().astimezone(ALMATY)
+        created = 0
+        with transaction.atomic():
+            for idx, (cat, title, hours, seats, hour) in enumerate(MORE_GATHERINGS):
+                place_name, address, district, lng, lat = PLACES[idx % len(PLACES)]
+                starts_at = (now + timedelta(hours=hours)).replace(hour=hour, minute=0, second=0)
+                if starts_at <= timezone.now() + timedelta(hours=1):
+                    starts_at += timedelta(days=1)
+                creator = users[3 + idx % (len(users) - 3)]
+                g = Gathering.objects.create(
+                    creator=creator,
+                    category=categories[cat],
+                    title=title,
+                    place_name=place_name,
+                    address=address,
+                    district=district,
+                    place_external_id=f"demo-more-{idx}",
+                    location=Point(lng + random.uniform(-0.004, 0.004), lat, srid=4326),
+                    starts_at=starts_at,
+                    seats=min(seats, 6),
+                )
+                Participation.objects.create(gathering=g, user=creator, is_creator=True)
+                # Знакомые Алины (+77000000002) — в части сборов, чтобы был сигнал «вы встречались»
+                others = [u for u in users if u not in (creator, users[2])]
+                random.shuffle(others)
+                for u in others[: random.randint(0, min(seats, 6) - 2)]:
+                    Participation.objects.create(gathering=g, user=u)
+                created += 1
+
+            for idx, (cat, title, ago, hour, idxs) in enumerate(MORE_HISTORY):
+                place_name, address, district, lng, lat = PLACES[idx % len(PLACES)]
+                starts_at = (now - timedelta(days=ago)).replace(hour=hour, minute=0, second=0)
+                members = [users[i] for i in idxs]
+                g = Gathering.objects.create(
+                    creator=members[0],
+                    category=categories[cat],
+                    title=title,
+                    place_name=place_name,
+                    address=address,
+                    district=district,
+                    place_external_id=f"demo-history-{idx}",
+                    location=Point(lng, lat, srid=4326),
+                    starts_at=starts_at,
+                    seats=4,
+                    status=Gathering.Status.FINISHED,
+                    happened=True,
+                    settled_at=starts_at + timedelta(hours=12),
+                )
+                for i, u in enumerate(members):
+                    Participation.objects.create(gathering=g, user=u, is_creator=i == 0)
+                    Attendance.objects.create(gathering=g, user=u)
+
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Добавлено: {created} сборов на неделю и {len(MORE_HISTORY)} прошедших встречи "
+                f"(история для {users[2].phone})"
+            )
         )

@@ -18,13 +18,13 @@ export function FeedMap() {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
       <figure className="card overflow-hidden p-0">
-        <CityMap points={points} label={t("home.mapLabel")} />
+        <CityMap points={points} label={t("home.mapLabel")} src="map" />
         <figcaption className="meta border-t-2 border-ink px-4 py-3">{t("home.mapCaption")}</figcaption>
       </figure>
       <ul className="space-y-5">
         {items.map((g) => (
           <li key={g.id}>
-            <GatheringCard g={g} />
+            <GatheringCard g={g} src="map" />
           </li>
         ))}
       </ul>

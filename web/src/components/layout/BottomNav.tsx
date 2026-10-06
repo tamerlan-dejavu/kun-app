@@ -7,6 +7,7 @@ import { t } from "@/i18n";
 import { Icon, type IconName } from "@/components/ui/Icon";
 
 const ITEMS: { href: string; label: Parameters<typeof t>[0]; icon: IconName }[] = [
+  { href: "/for-you", label: "nav.forYou", icon: "near" },
   { href: "/feed", label: "nav.feed", icon: "feed" },
   { href: "/my", label: "nav.my", icon: "list" },
   { href: "/profile", label: "nav.profile", icon: "user" },

@@ -25,6 +25,13 @@ class Interest(models.Model):
 
     slug = models.SlugField("код", max_length=50, unique=True)
     name = models.CharField("название", max_length=50)
+    categories = models.ManyToManyField(
+        Category,
+        related_name="interests",
+        blank=True,
+        verbose_name="категории сборов",
+        help_text="Какие сборы подходят людям с этим интересом — для подбора «Для тебя»",
+    )
     sort_order = models.PositiveSmallIntegerField("порядок", default=0)
     is_active = models.BooleanField("активен", default=True)
 

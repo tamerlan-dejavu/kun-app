@@ -170,8 +170,9 @@ def cancel_gathering(gathering, user, reason: str) -> Gathering:
 
 
 @transaction.atomic
-def join_gathering(gathering, user) -> Participation:
-    """Одна транзакция: статус и время, свободные места, блокировки с участниками."""
+def join_gathering(gathering, user, source: str = Participation.Source.LINK) -> Participation:
+    """Одна транзакция: статус и время, свободные места, блокировки с участниками.
+    source — откуда пришёл (лента, «Для тебя», карта) — для метрики подбора."""
     ensure_can_act(user)
     gathering = _lock(gathering)
 
@@ -195,7 +196,7 @@ def join_gathering(gathering, user) -> Participation:
     if count >= gathering.seats:
         raise KunError("gathering_full", "Мест больше нет")
 
-    participation = Participation.objects.create(gathering=gathering, user=user)
+    participation = Participation.objects.create(gathering=gathering, user=user, source=source)
     if count + 1 >= gathering.seats:
         gathering.status = Gathering.Status.FULL
         gathering.save(update_fields=["status", "updated_at"])

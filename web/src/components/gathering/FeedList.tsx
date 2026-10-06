@@ -111,7 +111,7 @@ export function FeedList() {
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((g) => (
             <li key={g.id}>
-              <GatheringCard g={g} />
+              <GatheringCard g={g} src="feed" />
             </li>
           ))}
         </ul>

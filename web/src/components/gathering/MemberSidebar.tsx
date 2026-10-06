@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { t } from "@/i18n";
 import { useGathering, useParticipation } from "@/lib/queries/gatherings";
+import type { Source } from "@/lib/source";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button, buttonClass } from "@/components/ui/Button";
@@ -11,9 +12,9 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { ShareButton } from "./ShareButton";
 
 // Правая колонка вошедшему: «Иду» / «Не смогу», чат, участники, «Поделиться».
-export function MemberSidebar({ id }: { id: number }) {
+export function MemberSidebar({ id, source }: { id: number; source?: Source }) {
   const query = useGathering(id);
-  const participation = useParticipation(id);
+  const participation = useParticipation(id, source);
 
   if (query.isPending) return <Skeleton className="h-64" />;
   if (query.isError) return null; // ошибку уже показала левая колонка
