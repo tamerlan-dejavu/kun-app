@@ -72,11 +72,13 @@ export function MemberSidebar({ id }: { id: number }) {
         <ul className="space-y-3">
           {g.participants.map((p) => (
             <li key={p.user.id} className="flex items-center gap-3">
-              <Avatar name={p.user.name} photo={p.user.photo} />
-              <div className="min-w-0">
-                <p className="truncate font-semibold">{p.user.name}</p>
-                {p.user.university && <p className="text-sm text-ink-muted">{p.user.university}</p>}
-              </div>
+              <Link href={`/u/${p.user.id}`} className="flex min-w-0 items-center gap-3 rounded-button hover:opacity-80">
+                <Avatar name={p.user.name} photo={p.user.photo} />
+                <div className="min-w-0">
+                  <p className="truncate font-semibold">{p.user.name}</p>
+                  {p.user.university && <p className="text-sm text-ink-muted">{p.user.university}</p>}
+                </div>
+              </Link>
               {p.is_creator && (
                 <span className="ml-auto">
                   <Badge tone="brand">{t("gathering.creator")}</Badge>
