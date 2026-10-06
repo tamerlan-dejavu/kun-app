@@ -449,6 +449,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/city": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Город сегодня (без входа)
+         * @description GET /public/city — витрина для главной: сегодня, люди (анонимно), места, точки карты.
+         */
+        get: operations["public_city_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/public/gatherings/{slug}": {
         parameters: {
             query?: never;
@@ -585,6 +605,64 @@ export interface components {
             /** Эмодзи */
             emoji?: string;
         };
+        CityCard: {
+            slug: string;
+            title: string;
+            category: components["schemas"]["Category"];
+            /** Format: date-time */
+            starts_at: string;
+            district: string;
+            seats: number;
+            participants_count: number;
+        };
+        CityPeople: {
+            slug: string;
+            title: string;
+            category: components["schemas"]["Category"];
+            /** Format: date-time */
+            starts_at: string;
+            district: string;
+            seats: number;
+            participants_count: number;
+            free_seats: number;
+            /** @description топ-3, анонимно */
+            interests: string[];
+        };
+        CityPlace: {
+            place_name: string;
+            district: string;
+            /** @description сборов за 60 дней */
+            gatherings: number;
+            /** @description открытых впереди */
+            upcoming: number;
+        };
+        CityPoint: {
+            slug: string;
+            title: string;
+            emoji: string;
+            /**
+             * Format: double
+             * @description огрублено до 0.01° (~1 км)
+             */
+            lat: number;
+            /**
+             * Format: double
+             * @description огрублено до 0.01° (~1 км)
+             */
+            lng: number;
+        };
+        CitySnapshot: {
+            /** Format: date */
+            date: string;
+            /** @description false — сегодня пусто, в schedule ближайшие */
+            is_today: boolean;
+            open_count: number;
+            today_count: number;
+            schedule: components["schemas"]["CityCard"][];
+            people: components["schemas"]["CityPeople"][];
+            places: components["schemas"]["CityPlace"][];
+            points: components["schemas"]["CityPoint"][];
+        };
         /** @description Место из поиска 2ГИС: координаты приходят отдельными полями, в БД — PointField. */
         GatheringCreateRequest: {
             /** Код */
@@ -640,16 +718,16 @@ export interface components {
              * @description если в запросе были lat/lng
              */
             distance_m?: number | null;
+            /** Format: double */
+            readonly lat: number;
+            /** Format: double */
+            readonly lng: number;
             /** Комментарий */
             comment?: string;
             /** Адрес */
             address: string;
             /** Id места в 2ГИС */
             place_external_id: string;
-            /** Format: double */
-            readonly lat: number;
-            /** Format: double */
-            readonly lng: number;
             creator: components["schemas"]["UserShort"];
             readonly is_creator: boolean;
             /** @description я уже отметил «Я пришёл» */
@@ -699,6 +777,10 @@ export interface components {
              * @description если в запросе были lat/lng
              */
             distance_m?: number | null;
+            /** Format: double */
+            readonly lat: number;
+            /** Format: double */
+            readonly lng: number;
         };
         /** @description Для страницы /g/<slug> гостю и Open Graph: без имён, фото и точного адреса. */
         GatheringPublic: {
@@ -1627,6 +1709,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    public_city_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CitySnapshot"];
+                };
             };
         };
     };

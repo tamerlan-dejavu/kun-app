@@ -11,9 +11,11 @@ from rest_framework.views import APIView
 from apps.common.pagination import StartsAtCursorPagination
 
 from . import selectors, services
+from .city import city_snapshot
 from .models import Gathering
 from .serializers import (
     CancelSerializer,
+    CitySnapshotSerializer,
     FeedParamsSerializer,
     GatheringCreateSerializer,
     GatheringDetailSerializer,
@@ -196,3 +198,14 @@ class PublicGatheringView(APIView):
         )
         gathering = get_object_or_404(qs, slug=slug)
         return Response(GatheringPublicSerializer(gathering).data)
+
+
+class PublicCityView(APIView):
+    """GET /public/city — витрина для главной: сегодня, люди (анонимно), места, точки карты."""
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    @extend_schema(tags=TAGS, summary="Город сегодня (без входа)", responses=CitySnapshotSerializer)
+    def get(self, request):
+        return Response(CitySnapshotSerializer(city_snapshot()).data)

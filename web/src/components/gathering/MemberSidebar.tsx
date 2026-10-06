@@ -27,7 +27,7 @@ export function MemberSidebar({ id }: { id: number }) {
 
   return (
     <div className="space-y-4">
-      <section className="space-y-3 rounded-card bg-surface p-6 shadow-card">
+      <section className="card space-y-3 p-6">
         {participation.isError && (
           <p role="alert" className="rounded-button bg-red-50 px-4 py-3 text-sm text-danger">
             {participation.error.message}
@@ -67,7 +67,7 @@ export function MemberSidebar({ id }: { id: number }) {
         <ShareButton slug={g.slug} title={g.title} />
       </section>
 
-      <section className="rounded-card bg-surface p-6 shadow-card">
+      <section className="card p-6">
         <h2 className="mb-4 text-base">{t("gathering.participants")}</h2>
         <ul className="space-y-3">
           {g.participants.map((p) => (

@@ -23,7 +23,7 @@ export function AfterView({ id }: { id: number }) {
   if (query.isError) return <ErrorState message={query.error.message} onRetry={() => query.refetch()} />;
 
   const g = query.data;
-  const note = (text: string) => <p className="rounded-card bg-surface p-6 shadow-card">{text}</p>;
+  const note = (text: string) => <p className="card p-6">{text}</p>;
   if (!g.is_participant) return note(t("after.notParticipant"));
   if (g.status === "cancelled") return note(t("after.cancelled"));
   if (new Date(g.starts_at) > new Date()) return note(t("after.notStarted"));
@@ -35,7 +35,7 @@ export function AfterView({ id }: { id: number }) {
 
   return (
     <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-      <section className="space-y-4 rounded-card bg-surface p-6 shadow-card md:p-8">
+      <section className="card space-y-4 p-6 md:p-8">
         <h2 className="text-xl">{t("after.attendTitle")}</h2>
         <p className="text-ink-muted">{t("after.attendHint")}</p>
         {g.attended ? (
@@ -55,7 +55,7 @@ export function AfterView({ id }: { id: number }) {
         )}
       </section>
 
-      <section className="space-y-4 rounded-card bg-surface p-6 shadow-card md:p-8">
+      <section className="card space-y-4 p-6 md:p-8">
         <h2 className="text-xl">{t("after.rateTitle")}</h2>
         <p className="text-ink-muted">{t("after.rateHint")}</p>
         {others.length === 0 ? (

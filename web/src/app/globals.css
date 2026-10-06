@@ -13,13 +13,41 @@ body {
 h1,
 h2,
 h3 {
-  @apply font-heading;
+  @apply font-heading font-extrabold tracking-tight;
 }
 
-/* Заметный фокус для работы с клавиатуры (WCAG 2.1 AA) */
+/* Фокус с клавиатуры — синий акцент: виден и на бумаге, и на терракоте */
 :focus-visible {
-  outline: 3px solid theme("colors.brand.600");
-  outline-offset: 2px;
+  outline: 3px solid theme("colors.blue.DEFAULT");
+  outline-offset: 3px;
+}
+
+@layer components {
+  /* Карточка: чёрная рамка + жёсткая тень. Основной строительный блок интерфейса. */
+  .card {
+    @apply rounded-card border-2 border-ink bg-surface shadow-card;
+  }
+
+  /* Интерактивная карточка: при наведении «приподнимается», при нажатии — «вдавливается» */
+  .card-link {
+    @apply card block transition-[transform,box-shadow] duration-100 ease-out;
+  }
+  .card-link:hover {
+    @apply -translate-x-0.5 -translate-y-0.5 shadow-lg;
+  }
+  .card-link:active {
+    @apply translate-x-1 translate-y-1 shadow-sm;
+  }
+
+  /* Метаданные: даты, время, координаты, категории — моноширинным */
+  .meta {
+    @apply font-mono text-xs uppercase tracking-wider;
+  }
+
+  /* Номер раздела: «01 —» */
+  .section-no {
+    @apply font-mono text-sm font-bold uppercase tracking-widest;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

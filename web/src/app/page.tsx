@@ -1,19 +1,29 @@
+import { getCity } from "@/lib/api/city";
 import { SiteShell } from "@/components/layout/SiteShell";
-import { Categories } from "@/components/landing/Categories";
-import { FinalCta } from "@/components/landing/FinalCta";
-import { Hero } from "@/components/landing/Hero";
-import { HowItWorks } from "@/components/landing/HowItWorks";
-import { Safety } from "@/components/landing/Safety";
+import { CityStrip } from "@/components/home/CityStrip";
+import { FinalSection } from "@/components/home/FinalSection";
+import { Hero } from "@/components/home/Hero";
+import { HowSection } from "@/components/home/HowSection";
+import { MapSection } from "@/components/home/MapSection";
+import { PeopleSection } from "@/components/home/PeopleSection";
+import { PlacesSection } from "@/components/home/PlacesSection";
+import { SafetySection } from "@/components/home/SafetySection";
+import { TodaySection } from "@/components/home/TodaySection";
 
-// / — лендинг: полосы на всю ширину, общие шапка и подвал сайта
-export default function LandingPage() {
+// / — главная: город как интерфейс. Данные — живые, из /public/city (без личных данных).
+export default async function HomePage() {
+  const city = await getCity();
   return (
     <SiteShell contained={false}>
       <Hero />
-      <HowItWorks />
-      <Categories />
-      <Safety />
-      <FinalCta />
+      <CityStrip city={city} />
+      <PlacesSection places={city?.places ?? []} />
+      <TodaySection city={city} />
+      <PeopleSection people={city?.people ?? []} />
+      <MapSection points={city?.points ?? []} />
+      <HowSection />
+      <SafetySection />
+      <FinalSection />
     </SiteShell>
   );
 }

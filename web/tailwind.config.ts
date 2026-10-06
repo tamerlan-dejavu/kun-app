@@ -13,6 +13,7 @@ const config: Config = {
       maxWidth: { app: "480px" },
       // Области нажатия не меньше 44x44 (WCAG 2.1 AA)
       minHeight: { tap: "44px" },
+      borderWidth: { 3: "3px" },
       minWidth: { tap: "44px" },
       height: { tap: "44px" },
     },

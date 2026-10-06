@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 
 const MIN = 3;
 const MAX = 5;
-const field = "w-full min-h-tap rounded-button border border-line bg-canvas px-4 py-2.5";
+const field = "w-full min-h-tap rounded-button border-2 border-ink bg-surface px-4 py-2.5";
 
 export function ProfileEditForm() {
   const router = useRouter();
@@ -57,7 +57,7 @@ export function ProfileEditForm() {
         );
       }}
     >
-      <section className="space-y-4 rounded-card bg-surface p-6 shadow-card">
+      <section className="card space-y-4 p-6">
         <h2 className="text-base">{t("editProfile.photo")}</h2>
         <Avatar name={me.data.name} photo={me.data.photo} size="lg" />
         {/* Своя кнопка вместо системной «Choose File»: подпись на языке сайта, а не браузера.
@@ -87,7 +87,7 @@ export function ProfileEditForm() {
         )}
       </section>
 
-      <section className="space-y-6 rounded-card bg-surface p-6 shadow-card md:p-8">
+      <section className="card space-y-6 p-6 md:p-8">
         <label className="block">
           <span className="mb-1.5 block font-semibold">{t("editProfile.name")}</span>
           <input value={name} maxLength={50} required onChange={(e) => setName(e.target.value)} className={field} />

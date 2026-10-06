@@ -8,18 +8,18 @@ export function TextPage({ doc }: { doc: TextDoc }) {
     <article>
       <PageTitle title={doc.title} />
       {doc.draft && (
-        <p role="note" className="mb-6 rounded-card bg-sand-100 p-4 text-sm font-semibold text-sand-800">
+        <p role="note" className="meta mb-6 rounded-card border-2 border-ink bg-brand p-4 font-bold">
           {t("info.draft")}
         </p>
       )}
       {doc.lead && <p className="mb-8 text-lg text-ink-muted">{doc.lead}</p>}
       {doc.sections.length > 3 && (
-        <nav aria-label={t("info.toc")} className="mb-10 rounded-card bg-surface p-6 shadow-card">
+        <nav aria-label={t("info.toc")} className="card mb-10 p-6">
           <p className="mb-3 font-heading text-sm">{t("info.toc")}</p>
           <ol className="space-y-1.5">
             {doc.sections.map((s) => (
               <li key={s.id}>
-                <a href={`#${s.id}`} className="text-brand underline-offset-4 hover:underline">
+                <a href={`#${s.id}`} className="text-blue underline underline-offset-4 hover:text-blue-700">
                   {s.title}
                 </a>
               </li>

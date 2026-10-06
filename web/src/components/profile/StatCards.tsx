@@ -6,11 +6,11 @@ export function StatCards({ happened, reliability }: { happened: number; reliabi
   return (
     <>
       <dl className="grid grid-cols-2 gap-4">
-        <div className="rounded-card bg-surface p-5 shadow-card">
+        <div className="card p-5">
           <dt className="text-sm text-ink-muted">{t("profile.happened")}</dt>
           <dd className="mt-1 font-heading text-3xl">{happened}</dd>
         </div>
-        <div className="rounded-card bg-surface p-5 shadow-card">
+        <div className="card p-5">
           <dt className="text-sm text-ink-muted">{t("profile.reliability")}</dt>
           {percent == null ? (
             <dd className="mt-2 font-semibold leading-snug text-ink-muted">{t("profile.reliabilityNone")}</dd>

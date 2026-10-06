@@ -71,9 +71,9 @@ export function ChatView({ gatheringId, readOnly }: Props) {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-180px)] flex-col overflow-hidden rounded-card bg-surface shadow-card md:h-[calc(100dvh-230px)]">
+    <div className="card flex h-[calc(100dvh-180px)] flex-col overflow-hidden md:h-[calc(100dvh-230px)]">
       {status === "closed" && (
-        <p role="status" className="bg-sand-100 px-4 py-2 text-center text-sm text-sand-800">
+        <p role="status" className="meta border-b-2 border-ink bg-brand px-4 py-2 text-center font-bold">
           {t("chat.reconnecting")}
         </p>
       )}
@@ -103,7 +103,7 @@ export function ChatView({ gatheringId, readOnly }: Props) {
         )}
       </div>
       {readOnly ? (
-        <p className="border-t border-line bg-surface px-4 py-4 text-center text-sm text-ink-muted">
+        <p className="border-t-2 border-ink bg-surface px-4 py-4 text-center text-sm text-ink-muted">
           {t("chat.readOnly")}
         </p>
       ) : (

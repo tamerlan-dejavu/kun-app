@@ -56,18 +56,18 @@ export function UserProfileView({ id }: { id: number }) {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
       <div className="space-y-6">
-        <section className="flex flex-col items-start gap-6 rounded-card bg-surface p-6 shadow-card sm:flex-row sm:items-center md:p-8">
+        <section className="card flex flex-col items-start gap-6 p-6 sm:flex-row sm:items-center md:p-8">
           <Avatar name={u.name} photo={u.photo} size="lg" />
           <div className="space-y-1.5">
             <h2 className="text-2xl">{u.name}</h2>
             {u.university && <p className="text-ink-muted">{u.university}</p>}
             <p className="text-sm text-ink-muted">{t("profile.since", { date: monthYear(u.date_joined) })}</p>
             {u.together_count > 0 && (
-              <p className="text-sm font-semibold text-brand">{t("profile.together", { n: u.together_count })}</p>
+              <p className="meta font-bold text-brand-700">{t("profile.together", { n: u.together_count })}</p>
             )}
           </div>
         </section>
-        <section className="rounded-card bg-surface p-6 shadow-card md:p-8">
+        <section className="card p-6 md:p-8">
           <h2 className="mb-4 text-base">{t("profile.interests")}</h2>
           <InterestChips interests={u.interests} common={u.common_interests} />
         </section>
@@ -76,7 +76,7 @@ export function UserProfileView({ id }: { id: number }) {
       <aside className="space-y-4">
         <StatCards happened={u.happened_gatherings_count} reliability={u.reliability} />
         {u.is_blocked && (
-          <p role="status" className="rounded-card bg-sand-100 p-4 text-sm font-semibold text-sand-800">
+          <p role="status" className="meta rounded-card border-2 border-ink bg-sand-100 p-4 font-bold">
             {t("profile.blocked")}
           </p>
         )}

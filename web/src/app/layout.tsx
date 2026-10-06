@@ -1,11 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope, Unbounded } from "next/font/google";
+import { Inter_Tight, JetBrains_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import "./globals.css";
 
-const manrope = Manrope({ subsets: ["latin", "cyrillic"], variable: "--font-manrope" });
-const unbounded = Unbounded({ subsets: ["latin", "cyrillic"], variable: "--font-unbounded" });
+// Гротеск для заголовков и текста, моноширинный — для дат, координат, категорий
+const grotesk = Inter_Tight({
+  subsets: ["latin", "cyrillic"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-grotesk",
+});
+const mono = JetBrains_Mono({ subsets: ["latin", "cyrillic"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
   title: { default: "KUN", template: "%s — KUN" },
@@ -16,14 +21,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#537179",
+  themeColor: "#F3F0E8",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ru" className={`${manrope.variable} ${unbounded.variable}`}>
+    <html lang="ru" className={`${grotesk.variable} ${mono.variable}`}>
       <body>
         <QueryProvider>{children}</QueryProvider>
       </body>

@@ -14,8 +14,8 @@ export function InterestChips({ interests, common = [] }: { interests: Interest[
           <li
             key={i.slug}
             className={clsx(
-              "rounded-chip px-3.5 py-1.5 text-sm font-semibold",
-              shared ? "bg-brand text-white" : "bg-sand-100 text-sand-800",
+              "meta rounded-chip border-2 border-ink px-2.5 py-1 font-bold",
+              shared ? "bg-brand text-ink" : "bg-surface text-ink",
             )}
           >
             {i.name}

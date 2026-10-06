@@ -13,7 +13,7 @@ export function FaqPage({ doc }: { doc: FaqDoc }) {
             <h2 className="mb-4 text-xl">{g.title}</h2>
             <div className="space-y-3">
               {g.items.map((item) => (
-                <details key={item.q} className="group rounded-card bg-surface shadow-card">
+                <details key={item.q} className="card group">
                   <summary className="flex min-h-tap cursor-pointer list-none items-center justify-between gap-4 px-6 py-4 font-semibold">
                     {item.q}
                     <span aria-hidden className="text-xl text-brand transition-transform group-open:rotate-45">

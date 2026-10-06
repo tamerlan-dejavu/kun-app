@@ -21,7 +21,7 @@ export function ProfileView() {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
       <div className="space-y-6">
-        <section className="flex flex-col items-start gap-6 rounded-card bg-surface p-6 shadow-card sm:flex-row sm:items-center md:p-8">
+        <section className="card flex flex-col items-start gap-6 p-6 sm:flex-row sm:items-center md:p-8">
           <Avatar name={u.name} photo={u.photo} size="lg" />
           <div className="flex-1 space-y-2">
             <h2 className="text-2xl">{u.name || "—"}</h2>
@@ -39,7 +39,7 @@ export function ProfileView() {
             {t("profile.edit")}
           </Link>
         </section>
-        <section className="rounded-card bg-surface p-6 shadow-card md:p-8">
+        <section className="card p-6 md:p-8">
           <h2 className="mb-4 text-base">{t("profile.interests")}</h2>
           <InterestChips interests={u.interests} />
         </section>

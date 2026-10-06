@@ -36,7 +36,7 @@ export function ReportDialog({
       <dialog
         ref={ref}
         aria-labelledby="report-title"
-        className="w-[min(92vw,480px)] rounded-card bg-surface p-0 text-ink shadow-card backdrop:bg-ink/40"
+        className="card w-[min(92vw,480px)] p-0 text-ink shadow-lg backdrop:bg-ink/50"
         onClose={close}
       >
         <form
@@ -47,7 +47,7 @@ export function ReportDialog({
             if (reason) report.mutate({ target_type: targetType, target_id: targetId, reason, text });
           }}
         >
-          <h2 id="report-title" className="text-xl">
+          <h2 id="report-title" className="text-2xl uppercase">
             {t("report.title")}
           </h2>
           {report.isSuccess ? (
@@ -87,7 +87,7 @@ export function ReportDialog({
                   maxLength={1000}
                   rows={3}
                   onChange={(e) => setText(e.target.value)}
-                  className="w-full rounded-button border border-line bg-canvas px-4 py-2.5"
+                  className="w-full rounded-button border-2 border-ink bg-canvas px-4 py-2.5"
                 />
               </label>
               {report.isError && (
