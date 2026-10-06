@@ -1,7 +1,16 @@
+import type { Metadata } from "next";
 import { t } from "@/i18n";
-import { SoonPage } from "@/components/layout/SoonPage";
+import { PageTitle } from "@/components/layout/PageTitle";
+import { ProfileView } from "@/components/profile/ProfileView";
 
-// /profile — свой профиль. Вместе с входом и онбордингом.
+export const metadata: Metadata = { title: "Профиль" };
+
+// /profile — свой профиль. Редактирование — вместе с онбордингом (вход по телефону).
 export default function MyProfilePage() {
-  return <SoonPage title={t("nav.profile")} />;
+  return (
+    <>
+      <PageTitle title={t("profile.title")} />
+      <ProfileView />
+    </>
+  );
 }

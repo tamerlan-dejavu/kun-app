@@ -14,9 +14,9 @@ export function MemberDetails({ id }: { id: number }) {
   return (
     <>
       {g.moderation_status === "pending" && (
-        <p className="rounded-card bg-sand-100 p-4 text-sm text-sand-800">{t("gathering.pending")}</p>
+        <p className="rounded-card border-2 border-ink bg-sand-100 p-4 text-sm font-semibold text-sand-800">{t("gathering.pending")}</p>
       )}
-      <section className="space-y-5 rounded-card bg-surface p-6 shadow-card md:p-8">
+      <section className="card space-y-5 p-6 md:p-8">
         <div>
           <h2 className="mb-1 text-sm text-ink-muted">{t("gathering.address")}</h2>
           <p className="text-lg font-semibold">{g.place_name}</p>

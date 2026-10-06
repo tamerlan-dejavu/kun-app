@@ -64,7 +64,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description POST /blocks */
+        /**
+         * Заблокировать
+         * @description POST /blocks
+         */
         post: operations["blocks_create"];
         delete?: never;
         options?: never;
@@ -82,8 +85,91 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** @description DELETE /blocks/{userId} */
+        /**
+         * Разблокировать
+         * @description DELETE /blocks/{userId}
+         */
         delete: operations["blocks_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Категории сборов
+         * @description GET /catalog/categories — активные категории сборов (фильтр ленты, создание сбора).
+         */
+        get: operations["catalog_categories_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/interests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Интересы
+         * @description GET /catalog/interests — интересы для профиля (онбординг).
+         */
+        get: operations["catalog_interests_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/universities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Вузы
+         * @description GET /catalog/universities — справочник вузов для профиля.
+         */
+        get: operations["catalog_universities_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/for-you": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Для тебя: персональный подбор
+         * @description GET /for-you — 5–10 сборов на сегодня и ближайшие дни с объяснением «почему».
+         */
+        get: operations["for_you_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -275,16 +361,19 @@ export interface paths {
         };
         /**
          * Свой профиль
-         * @description GET /me, PATCH /me (онбординг), DELETE /me (удаление аккаунта).
+         * @description GET /me, PATCH /me — профиль; DELETE /me — удаление аккаунта (TODO).
          */
         get: operations["me_retrieve"];
         put?: never;
         post?: never;
-        /** @description GET /me, PATCH /me (онбординг), DELETE /me (удаление аккаунта). */
+        /** @description GET /me, PATCH /me — профиль; DELETE /me — удаление аккаунта (TODO). */
         delete: operations["me_destroy"];
         options?: never;
         head?: never;
-        /** @description GET /me, PATCH /me (онбординг), DELETE /me (удаление аккаунта). */
+        /**
+         * Изменить профиль: имя, вуз, интересы
+         * @description GET /me, PATCH /me — профиль; DELETE /me — удаление аккаунта (TODO).
+         */
         patch: operations["me_partial_update"];
         trace?: never;
     };
@@ -335,7 +424,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description POST /me/photo — до 5 МБ, JPG/PNG/WebP. */
+        /**
+         * Загрузить фото
+         * @description POST /me/photo — до 5 МБ, JPG/PNG/WebP; сервер обрезает до квадрата и убирает EXIF.
+         */
         post: operations["me_photo_create"];
         delete?: never;
         options?: never;
@@ -377,6 +469,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/city": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Город сегодня (без входа)
+         * @description GET /public/city — витрина для главной: сегодня, люди (анонимно), места, точки карты.
+         */
+        get: operations["public_city_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/public/gatherings/{slug}": {
         parameters: {
             query?: never;
@@ -406,7 +518,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description POST /reports */
+        /**
+         * Пожаловаться
+         * @description POST /reports — жалоба на пользователя, сбор или сообщение.
+         */
         post: operations["reports_create"];
         delete?: never;
         options?: never;
@@ -477,7 +592,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description GET /users/{id} — публичный профиль. */
+        /**
+         * Профиль пользователя
+         * @description GET /users/{id} — публичный профиль. Кто заблокировал меня — для меня не существует.
+         */
         get: operations["users_retrieve"];
         put?: never;
         post?: never;
@@ -493,6 +611,9 @@ export interface components {
     schemas: {
         /** @enum {unknown} */
         BlankEnum: "";
+        BlockCreateRequest: {
+            user_id: number;
+        };
         CancelRequest: {
             reason: string;
         };
@@ -503,6 +624,80 @@ export interface components {
             name: string;
             /** Эмодзи */
             emoji?: string;
+        };
+        CityCard: {
+            slug: string;
+            title: string;
+            category: components["schemas"]["Category"];
+            /** Format: date-time */
+            starts_at: string;
+            district: string;
+            seats: number;
+            participants_count: number;
+        };
+        CityPeople: {
+            slug: string;
+            title: string;
+            category: components["schemas"]["Category"];
+            /** Format: date-time */
+            starts_at: string;
+            district: string;
+            seats: number;
+            participants_count: number;
+            free_seats: number;
+            /** @description топ-3, анонимно */
+            interests: string[];
+        };
+        CityPlace: {
+            place_name: string;
+            district: string;
+            /** @description сборов за 60 дней */
+            gatherings: number;
+            /** @description открытых впереди */
+            upcoming: number;
+        };
+        CityPoint: {
+            slug: string;
+            title: string;
+            emoji: string;
+            /**
+             * Format: double
+             * @description огрублено до 0.01° (~1 км)
+             */
+            lat: number;
+            /**
+             * Format: double
+             * @description огрублено до 0.01° (~1 км)
+             */
+            lng: number;
+        };
+        CitySnapshot: {
+            /** Format: date */
+            date: string;
+            /** @description false — сегодня пусто, в schedule ближайшие */
+            is_today: boolean;
+            open_count: number;
+            today_count: number;
+            schedule: components["schemas"]["CityCard"][];
+            people: components["schemas"]["CityPeople"][];
+            places: components["schemas"]["CityPlace"][];
+            points: components["schemas"]["CityPoint"][];
+        };
+        /**
+         * @description * `together` - together
+         *     * `attended` - attended
+         *     * `interest` - interest
+         *     * `common` - common
+         *     * `time_habit` - time_habit
+         *     * `near` - near
+         *     * `popular` - popular
+         *     * `fresh` - fresh
+         * @enum {string}
+         */
+        CodeEnum: "together" | "attended" | "interest" | "common" | "time_habit" | "near" | "popular" | "fresh";
+        ForYouItem: {
+            gathering: components["schemas"]["GatheringList"];
+            reason: components["schemas"]["Reason"];
         };
         /** @description Место из поиска 2ГИС: координаты приходят отдельными полями, в БД — PointField. */
         GatheringCreateRequest: {
@@ -551,7 +746,7 @@ export interface components {
             seats: number;
             participants_count: number;
             /** Статус */
-            status?: components["schemas"]["StatusEnum"];
+            status?: components["schemas"]["Status1f3Enum"];
             /** @default false */
             is_participant: boolean;
             /**
@@ -559,18 +754,24 @@ export interface components {
              * @description если в запросе были lat/lng
              */
             distance_m?: number | null;
+            /** Format: double */
+            readonly lat: number;
+            /** Format: double */
+            readonly lng: number;
             /** Комментарий */
             comment?: string;
             /** Адрес */
             address: string;
             /** Id места в 2ГИС */
             place_external_id: string;
-            /** Format: double */
-            readonly lat: number;
-            /** Format: double */
-            readonly lng: number;
             creator: components["schemas"]["UserShort"];
             readonly is_creator: boolean;
+            /** @description я уже отметил «Я пришёл» */
+            readonly attended: boolean;
+            /** @description мои оценки: {user_id: ok | no_show}; чужие оценки не отдаются */
+            readonly my_ratings: {
+                [key: string]: string;
+            };
             readonly participants: components["schemas"]["Participant"][];
             /** Модерация */
             moderation_status?: components["schemas"]["ModerationStatusEnum"];
@@ -604,7 +805,7 @@ export interface components {
             seats: number;
             participants_count: number;
             /** Статус */
-            status?: components["schemas"]["StatusEnum"];
+            status?: components["schemas"]["Status1f3Enum"];
             /** @default false */
             is_participant: boolean;
             /**
@@ -612,6 +813,10 @@ export interface components {
              * @description если в запросе были lat/lng
              */
             distance_m?: number | null;
+            /** Format: double */
+            readonly lat: number;
+            /** Format: double */
+            readonly lng: number;
         };
         /** @description Для страницы /g/<slug> гостю и Open Graph: без имён, фото и точного адреса. */
         GatheringPublic: {
@@ -631,7 +836,25 @@ export interface components {
             seats: number;
             participants_count: number;
             /** Статус */
-            status?: components["schemas"]["StatusEnum"];
+            status?: components["schemas"]["Status1f3Enum"];
+        };
+        Interest: {
+            /** Код */
+            slug: string;
+            /** Название */
+            name: string;
+        };
+        JoinRequest: {
+            /**
+             * @description откуда пришёл — для метрики «Для тебя»
+             *
+             *     * `feed` - Лента
+             *     * `for_you` - Для тебя
+             *     * `map` - Карта
+             *     * `link` - Ссылка / другое
+             * @default link
+             */
+            source: components["schemas"]["SourceEnum"];
         };
         /**
          * @description * `user` - Сообщение участника
@@ -639,10 +862,7 @@ export interface components {
          * @enum {string}
          */
         KindEnum: "user" | "system";
-        /**
-         * @description Свой профиль: телефон виден только самому пользователю.
-         *     TODO: запись (онбординг: 18+, согласия, имя, вуз, интересы) — вместе с входом по телефону.
-         */
+        /** @description Свой профиль: телефон виден только самому пользователю. */
         Me: {
             readonly id: number;
             /** Телефон */
@@ -655,6 +875,8 @@ export interface components {
              */
             readonly photo: string | null;
             university?: string;
+            university_id: number | null;
+            interests: components["schemas"]["Interest"][];
             /** Роль */
             readonly role: components["schemas"]["RoleEnum"];
             /**
@@ -664,6 +886,11 @@ export interface components {
             readonly reliability: number | null;
             /** Состоявшихся сборов */
             readonly happened_gatherings_count: number;
+            /**
+             * Зарегистрирован
+             * Format: date-time
+             */
+            readonly date_joined: string;
             readonly onboarding_completed: boolean;
         };
         /** @description Сообщение в истории и в событии message.new. Скрытое — без текста и данных. */
@@ -751,6 +978,47 @@ export interface components {
             /** Format: double */
             lng?: number;
         };
+        /** @description Редактирование профиля. Интересы — от 3 до 5 (раздел 3.2 ТЗ). */
+        PatchedMeUpdateRequest: {
+            name?: string;
+            university?: number | null;
+            interests?: string[];
+        };
+        PhotoUploadRequest: {
+            /** Format: binary */
+            photo: string;
+        };
+        /** @description Чужой профиль: имя, фото, вуз, интересы, сборы, надёжность. Телефона нет. */
+        PublicUser: {
+            readonly id: number;
+            /** Имя */
+            readonly name: string;
+            /**
+             * Фото
+             * Format: uri
+             */
+            readonly photo: string | null;
+            university?: string;
+            interests: components["schemas"]["Interest"][];
+            /** Состоявшихся сборов */
+            readonly happened_gatherings_count: number;
+            /**
+             * Надёжность
+             * Format: double
+             */
+            readonly reliability: number | null;
+            /**
+             * Зарегистрирован
+             * Format: date-time
+             */
+            readonly date_joined: string;
+            /** @description slug общих интересов со мной */
+            readonly common_interests: string[];
+            /** @description на скольких сборах мы оба отметили «Я пришёл» */
+            readonly together_count: number;
+            /** @description я заблокировал этого человека */
+            readonly is_blocked: boolean;
+        };
         RatingItemRequest: {
             user_id: number;
             value: components["schemas"]["ValueEnum"];
@@ -758,6 +1026,62 @@ export interface components {
         RatingsRequest: {
             ratings: components["schemas"]["RatingItemRequest"][];
         };
+        Reason: {
+            /**
+             * @description почему советуем; текст строит клиент из code и params
+             *
+             *     * `together` - together
+             *     * `attended` - attended
+             *     * `interest` - interest
+             *     * `common` - common
+             *     * `time_habit` - time_habit
+             *     * `near` - near
+             *     * `popular` - popular
+             *     * `fresh` - fresh
+             */
+            code: components["schemas"]["CodeEnum"];
+            /** @description name, n, category, interest, bucket, km */
+            params: {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * @description * `spam` - Спам или реклама
+         *     * `harassment` - Оскорбления, травля
+         *     * `inappropriate` - Неприемлемый контент
+         *     * `danger` - Угроза безопасности
+         *     * `underage` - Похоже, младше 18
+         *     * `fake` - Фейковый профиль
+         *     * `no_show` - Не пришёл, не предупредил
+         *     * `other` - Другое
+         * @enum {string}
+         */
+        ReasonEnum: "spam" | "harassment" | "inappropriate" | "danger" | "underage" | "fake" | "no_show" | "other";
+        Report: {
+            readonly id: number;
+            /** Статус */
+            readonly status: components["schemas"]["ReportStatusEnum"];
+            /**
+             * Создана
+             * Format: date-time
+             */
+            readonly created_at: string;
+        };
+        ReportCreateRequest: {
+            target_type: components["schemas"]["TargetTypeEnum"];
+            target_id: number;
+            reason: components["schemas"]["ReasonEnum"];
+            /** @default  */
+            text: string;
+        };
+        /**
+         * @description * `new` - Новая
+         *     * `in_review` - В работе
+         *     * `resolved` - Принято решение
+         *     * `rejected` - Отклонена
+         * @enum {string}
+         */
+        ReportStatusEnum: "new" | "in_review" | "resolved" | "rejected";
         /**
          * @description * `user` - Пользователь
          *     * `moderator` - Модератор
@@ -766,13 +1090,21 @@ export interface components {
          */
         RoleEnum: "user" | "moderator" | "admin";
         /**
+         * @description * `feed` - Лента
+         *     * `for_you` - Для тебя
+         *     * `map` - Карта
+         *     * `link` - Ссылка / другое
+         * @enum {string}
+         */
+        SourceEnum: "feed" | "for_you" | "map" | "link";
+        /**
          * @description * `open` - Набор открыт
          *     * `full` - Мест нет
          *     * `cancelled` - Отменён
          *     * `finished` - Прошёл
          * @enum {string}
          */
-        StatusEnum: "open" | "full" | "cancelled" | "finished";
+        Status1f3Enum: "open" | "full" | "cancelled" | "finished";
         /**
          * @description * `joined` - Присоединился
          *     * `left` - Вышел
@@ -782,6 +1114,22 @@ export interface components {
          * @enum {string}
          */
         SystemEventEnum: "joined" | "left" | "updated" | "cancelled" | "creator_changed";
+        /**
+         * @description * `user` - Пользователь
+         *     * `gathering` - Сбор
+         *     * `message` - Сообщение
+         * @enum {string}
+         */
+        TargetTypeEnum: "user" | "gathering" | "message";
+        University: {
+            readonly id: number;
+            /** Название */
+            name: string;
+            /** Короткое имя */
+            short_name: string;
+            /** Город */
+            city?: string;
+        };
         /** @description Участник в сборе: имя, фото, вуз. Телефон не отдаём никогда. */
         UserShort: {
             readonly id: number;
@@ -870,10 +1218,16 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BlockCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BlockCreateRequest"];
+                "multipart/form-data": components["schemas"]["BlockCreateRequest"];
+            };
+        };
         responses: {
-            /** @description No response body */
-            200: {
+            /** @description Заблокирован */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -892,12 +1246,101 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
+            /** @description Снято */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    catalog_categories_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Category"][];
+                };
+            };
+        };
+    };
+    catalog_interests_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Interest"][];
+                };
+            };
+        };
+    };
+    catalog_universities_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["University"][];
+                };
+            };
+        };
+    };
+    for_you_list: {
+        parameters: {
+            query?: {
+                /** @description slug категории */
+                category?: string;
+                /**
+                 * @description по календарю Алматы
+                 *
+                 *     * `today` - today
+                 *     * `tomorrow` - tomorrow
+                 *     * `week` - week
+                 */
+                date?: "today" | "tomorrow" | "week";
+                lat?: number;
+                lng?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ForYouItem"][];
+                };
             };
         };
     };
@@ -1064,7 +1507,13 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["JoinRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["JoinRequest"];
+                "multipart/form-data": components["schemas"]["JoinRequest"];
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -1236,14 +1685,21 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedMeUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedMeUpdateRequest"];
+                "multipart/form-data": components["schemas"]["PatchedMeUpdateRequest"];
+            };
+        };
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["Me"];
+                };
             };
         };
     };
@@ -1317,14 +1773,19 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["PhotoUploadRequest"];
+            };
+        };
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["Me"];
+                };
             };
         };
     };
@@ -1364,6 +1825,25 @@ export interface operations {
             };
         };
     };
+    public_city_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CitySnapshot"];
+                };
+            };
+        };
+    };
     public_gatherings_retrieve: {
         parameters: {
             query?: never;
@@ -1392,14 +1872,21 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReportCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ReportCreateRequest"];
+                "multipart/form-data": components["schemas"]["ReportCreateRequest"];
+            };
+        };
         responses: {
-            /** @description No response body */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["Report"];
+                };
             };
         };
     };
@@ -1483,12 +1970,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PublicUser"];
+                };
             };
         };
     };

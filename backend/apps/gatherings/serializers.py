@@ -4,16 +4,11 @@ from rest_framework import serializers
 
 from apps.accounts.models import User
 from apps.catalog.models import Category
+from apps.catalog.serializers import CategorySerializer
 
-from .models import SEATS_MAX, SEATS_MIN, Gathering, Rating
+from .models import SEATS_MAX, SEATS_MIN, Gathering, Participation, Rating
 
 # --- вложенные -------------------------------------------------------------------------------
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ["slug", "name", "emoji"]
 
 
 class UserShortSerializer(serializers.ModelSerializer):
@@ -44,6 +39,8 @@ class GatheringListSerializer(serializers.ModelSerializer):
     distance_m = serializers.FloatField(
         required=False, allow_null=True, help_text="если в запросе были lat/lng"
     )
+    lat = serializers.SerializerMethodField()
+    lng = serializers.SerializerMethodField()
 
     class Meta:
         model = Gathering
@@ -60,37 +57,13 @@ class GatheringListSerializer(serializers.ModelSerializer):
             "status",
             "is_participant",
             "distance_m",
+            "lat",
+            "lng",
         ]
         # slug генерируется моделью: в ответе есть всегда (иначе в OpenAPI он «необязательный»)
         read_only_fields = ["slug"]
 
-
-class GatheringDetailSerializer(GatheringListSerializer):
-    """Сбор целиком: точный адрес, координаты, участники."""
-
-    lat = serializers.SerializerMethodField()
-    lng = serializers.SerializerMethodField()
-    creator = UserShortSerializer()
-    participants = serializers.SerializerMethodField()
-    is_creator = serializers.SerializerMethodField()
-
-    class Meta(GatheringListSerializer.Meta):
-        fields = [
-            *GatheringListSerializer.Meta.fields,
-            "comment",
-            "address",
-            "place_external_id",
-            "lat",
-            "lng",
-            "creator",
-            "is_creator",
-            "participants",
-            "moderation_status",
-            "cancel_reason",
-            "cancelled_at",
-            "created_at",
-        ]
-
+    # Точные координаты — только вошедшим (лента, карта); гостю — огрублённые из /public/city
     @extend_schema_field(serializers.FloatField())
     def get_lat(self, obj):
         return obj.location.y
@@ -99,10 +72,58 @@ class GatheringDetailSerializer(GatheringListSerializer):
     def get_lng(self, obj):
         return obj.location.x
 
+
+class GatheringDetailSerializer(GatheringListSerializer):
+    """Сбор целиком: точный адрес, координаты, участники."""
+
+    creator = UserShortSerializer()
+    participants = serializers.SerializerMethodField()
+    is_creator = serializers.SerializerMethodField()
+    attended = serializers.SerializerMethodField(help_text="я уже отметил «Я пришёл»")
+    my_ratings = serializers.SerializerMethodField(
+        help_text="мои оценки: {user_id: ok | no_show}; чужие оценки не отдаются"
+    )
+
+    class Meta(GatheringListSerializer.Meta):
+        fields = [
+            *GatheringListSerializer.Meta.fields,
+            "comment",
+            "address",
+            "place_external_id",
+            "creator",
+            "is_creator",
+            "attended",
+            "my_ratings",
+            "participants",
+            "moderation_status",
+            "cancel_reason",
+            "cancelled_at",
+            "created_at",
+        ]
+
     @extend_schema_field(serializers.BooleanField())
     def get_is_creator(self, obj):
         request = self.context.get("request")
         return bool(request and obj.creator_id == request.user.pk)
+
+    @extend_schema_field(serializers.BooleanField())
+    def get_attended(self, obj):
+        user = self._user()
+        return bool(user) and obj.attendances.filter(user=user).exists()
+
+    @extend_schema_field(serializers.DictField(child=serializers.CharField()))
+    def get_my_ratings(self, obj):
+        user = self._user()
+        if not user:
+            return {}
+        return {
+            str(ratee): value
+            for ratee, value in obj.ratings.filter(rater=user).values_list("ratee_id", "value")
+        }
+
+    def _user(self):
+        request = self.context.get("request")
+        return request.user if request and request.user.is_authenticated else None
 
     @extend_schema_field(ParticipantSerializer(many=True))
     def get_participants(self, obj):
@@ -241,3 +262,80 @@ class FeedParamsSerializer(serializers.Serializer):
 
 class MyGatheringsParamsSerializer(serializers.Serializer):
     when = serializers.ChoiceField(choices=["upcoming", "past"], default="upcoming")
+
+
+# --- публичная витрина города (главная) --------------------------------------------------------
+
+
+class CityCardSerializer(serializers.Serializer):
+    slug = serializers.CharField()
+    title = serializers.CharField()
+    category = CategorySerializer()
+    starts_at = serializers.DateTimeField()
+    district = serializers.CharField()
+    seats = serializers.IntegerField()
+    participants_count = serializers.IntegerField()
+
+
+class CityPeopleSerializer(CityCardSerializer):
+    free_seats = serializers.IntegerField()
+    interests = serializers.ListField(child=serializers.CharField(), help_text="топ-3, анонимно")
+
+
+class CityPlaceSerializer(serializers.Serializer):
+    place_name = serializers.CharField()
+    district = serializers.CharField()
+    gatherings = serializers.IntegerField(help_text="сборов за 60 дней")
+    upcoming = serializers.IntegerField(help_text="открытых впереди")
+
+
+class CityPointSerializer(serializers.Serializer):
+    slug = serializers.CharField()
+    title = serializers.CharField()
+    emoji = serializers.CharField()
+    lat = serializers.FloatField(help_text="огрублено до 0.01° (~1 км)")
+    lng = serializers.FloatField(help_text="огрублено до 0.01° (~1 км)")
+
+
+class CitySnapshotSerializer(serializers.Serializer):
+    date = serializers.DateField()
+    is_today = serializers.BooleanField(help_text="false — сегодня пусто, в schedule ближайшие")
+    open_count = serializers.IntegerField()
+    today_count = serializers.IntegerField()
+    schedule = CityCardSerializer(many=True)
+    people = CityPeopleSerializer(many=True)
+    places = CityPlaceSerializer(many=True)
+    points = CityPointSerializer(many=True)
+
+
+class JoinSerializer(serializers.Serializer):
+    source = serializers.ChoiceField(
+        choices=Participation.Source.choices,
+        default=Participation.Source.LINK,
+        help_text="откуда пришёл — для метрики «Для тебя»",
+    )
+
+
+# --- «Для тебя» -------------------------------------------------------------------------------
+
+
+class ReasonSerializer(serializers.Serializer):
+    code = serializers.ChoiceField(
+        choices=[
+            "together",
+            "attended",
+            "interest",
+            "common",
+            "time_habit",
+            "near",
+            "popular",
+            "fresh",
+        ],
+        help_text="почему советуем; текст строит клиент из code и params",
+    )
+    params = serializers.DictField(help_text="name, n, category, interest, bucket, km")
+
+
+class ForYouItemSerializer(serializers.Serializer):
+    gathering = GatheringListSerializer()
+    reason = ReasonSerializer()

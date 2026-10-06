@@ -2,6 +2,7 @@
 
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, nextCursor, unwrap } from "@/lib/api/client";
+import type { Source } from "@/lib/source";
 import { keys } from "./keys";
 
 export type FeedFilters = {
@@ -43,13 +44,13 @@ export function useGathering(id: number) {
 type Action = "join" | "leave";
 
 /** Присоединиться / выйти: ответ — сбор целиком, кладём его в кэш и обновляем списки. */
-export function useParticipation(id: number) {
+export function useParticipation(id: number, source: Source = "link") {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (action: Action) =>
       unwrap(
         action === "join"
-          ? api.POST("/api/v1/gatherings/{id}/join", { params: { path: { id } } })
+          ? api.POST("/api/v1/gatherings/{id}/join", { params: { path: { id } }, body: { source } })
           : api.POST("/api/v1/gatherings/{id}/leave", { params: { path: { id } } }),
       ),
     onSuccess: (gathering) => {

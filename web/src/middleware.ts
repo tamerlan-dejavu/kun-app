@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 // Закрытые страницы без сессии -> /login?next=...
-const PROTECTED = ["/feed", "/new", "/my", "/profile", "/settings", "/onboarding", "/u/"];
+const PROTECTED = ["/for-you", "/feed", "/map", "/new", "/my", "/profile", "/settings", "/onboarding", "/u/"];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;

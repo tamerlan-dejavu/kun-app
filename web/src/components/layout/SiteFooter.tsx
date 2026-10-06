@@ -2,7 +2,7 @@ import Link from "next/link";
 import { t } from "@/i18n";
 import { Container } from "./Container";
 
-const LINKS = [
+const INFO = [
   { href: "/faq", label: "landing.faq" },
   { href: "/rules", label: "landing.rules" },
   { href: "/terms", label: "landing.terms" },
@@ -10,23 +10,49 @@ const LINKS = [
   { href: "/support", label: "landing.support" },
 ] as const;
 
+const CITY = [
+  { href: "/#today", label: "nav.today" },
+  { href: "/#people", label: "nav.people" },
+  { href: "/#map", label: "nav.map" },
+] as const;
+
+// Подвал — чёрная плита с огромным словом KUN, выходящим за край.
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t border-line bg-surface/60 py-10">
-      <Container className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p className="font-heading text-brand">KUN</p>
-          <p className="mt-1 text-sm text-ink-muted">{t("landing.tagline")}</p>
-        </div>
-        <nav aria-label={t("landing.footerNav")} className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-muted">
-          {LINKS.map((l) => (
-            <Link key={l.href} href={l.href} className="hover:text-ink">
-              {t(l.label)}
-            </Link>
-          ))}
+    <footer className="mt-auto overflow-hidden border-t-2 border-ink bg-ink text-canvas">
+      <Container className="grid gap-10 py-12 md:grid-cols-4">
+        <p className="max-w-xs text-canvas/80 md:col-span-2">{t("footer.tagline")}</p>
+        <nav aria-label={t("footer.city")}>
+          <p className="meta mb-3 text-brand">{t("footer.city")}</p>
+          <ul className="space-y-2">
+            {CITY.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className="hover:underline hover:underline-offset-4">
+                  {t(l.label)}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </nav>
-        <p className="whitespace-nowrap text-sm text-ink-muted">
-          © {new Date().getFullYear()} {t("landing.copyright")}
+        <nav aria-label={t("footer.info")}>
+          <p className="meta mb-3 text-brand">{t("footer.info")}</p>
+          <ul className="space-y-2">
+            {INFO.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className="hover:underline hover:underline-offset-4">
+                  {t(l.label)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </Container>
+      <Container className="flex items-end justify-between gap-4 pb-4">
+        <p aria-hidden className="select-none font-heading text-[clamp(5rem,22vw,18rem)] font-black leading-[0.75] tracking-tighter text-canvas/95">
+          KUN
+        </p>
+        <p className="meta whitespace-nowrap pb-2 text-canvas/70">
+          © {new Date().getFullYear()} · {t("home.coords")}
         </p>
       </Container>
     </footer>

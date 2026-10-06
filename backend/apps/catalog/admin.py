@@ -13,5 +13,6 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Interest)
 class InterestAdmin(admin.ModelAdmin):
     list_display = ["name", "slug", "sort_order", "is_active"]
+    filter_horizontal = ["categories"]  # связь «интерес → категории» для подбора
     list_editable = ["sort_order", "is_active"]
     prepopulated_fields = {"slug": ["name"]}

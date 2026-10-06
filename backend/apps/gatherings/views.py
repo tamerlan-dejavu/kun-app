@@ -11,15 +11,20 @@ from rest_framework.views import APIView
 from apps.common.pagination import StartsAtCursorPagination
 
 from . import selectors, services
+from .city import city_snapshot
+from .for_you import recommend
 from .models import Gathering
 from .serializers import (
     CancelSerializer,
+    CitySnapshotSerializer,
     FeedParamsSerializer,
+    ForYouItemSerializer,
     GatheringCreateSerializer,
     GatheringDetailSerializer,
     GatheringListSerializer,
     GatheringPublicSerializer,
     GatheringUpdateSerializer,
+    JoinSerializer,
     MyGatheringsParamsSerializer,
     RatingsSerializer,
 )
@@ -120,11 +125,16 @@ class GatheringCancelView(APIView):
 
 class GatheringJoinView(APIView):
     @extend_schema(
-        tags=TAGS, summary="Присоединиться", request=None, responses=GatheringDetailSerializer
+        tags=TAGS,
+        summary="Присоединиться",
+        request=JoinSerializer,
+        responses=GatheringDetailSerializer,
     )
     def post(self, request, pk):
         gathering = get_visible(request, pk)
-        services.join_gathering(gathering, request.user)
+        params = JoinSerializer(data=request.data)
+        params.is_valid(raise_exception=True)
+        services.join_gathering(gathering, request.user, params.validated_data["source"])
         return detail_response(request, gathering)
 
 
@@ -196,3 +206,35 @@ class PublicGatheringView(APIView):
         )
         gathering = get_object_or_404(qs, slug=slug)
         return Response(GatheringPublicSerializer(gathering).data)
+
+
+class PublicCityView(APIView):
+    """GET /public/city — витрина для главной: сегодня, люди (анонимно), места, точки карты."""
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    @extend_schema(tags=TAGS, summary="Город сегодня (без входа)", responses=CitySnapshotSerializer)
+    def get(self, request):
+        return Response(CitySnapshotSerializer(city_snapshot()).data)
+
+
+class ForYouView(APIView):
+    """GET /for-you — 5–10 сборов на сегодня и ближайшие дни с объяснением «почему»."""
+
+    @extend_schema(
+        tags=TAGS,
+        summary="Для тебя: персональный подбор",
+        parameters=[FeedParamsSerializer],
+        responses=ForYouItemSerializer(many=True),
+    )
+    def get(self, request):
+        params = FeedParamsSerializer(data=request.query_params)
+        params.is_valid(raise_exception=True)
+        p = params.validated_data
+        point = Point(p["lng"], p["lat"], srid=4326) if "lat" in p else None
+        items = [
+            {"gathering": s.gathering, "reason": s.reason}
+            for s in recommend(request.user, point=point)
+        ]
+        return Response(ForYouItemSerializer(items, many=True, context={"request": request}).data)

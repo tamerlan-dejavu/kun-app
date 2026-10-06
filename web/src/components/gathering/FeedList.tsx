@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { t } from "@/i18n";
+import { useCategories } from "@/lib/queries/catalog";
 import { type FeedFilters, useFeed } from "@/lib/queries/gatherings";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
@@ -22,9 +23,10 @@ export function FeedList() {
   const [filters, setFilters] = useState<FeedFilters>({});
   const [geoDenied, setGeoDenied] = useState(false);
   const feed = useFeed(filters);
+  const categories = useCategories();
   const items = feed.data?.pages.flatMap((p) => p.results) ?? [];
   const near = filters.lat !== undefined;
-  const filtered = Boolean(filters.date || near);
+  const filtered = Boolean(filters.date || filters.category || near);
 
   const toggleNear = () => {
     if (near) return setFilters(({ lat: _lat, lng: _lng, ...rest }) => rest);
@@ -59,6 +61,30 @@ export function FeedList() {
           {t("feed.near")}
         </Chip>
       </div>
+      {categories.data && (
+        <div
+          role="group"
+          aria-label={t("feed.categoryFilter")}
+          className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-5 md:mx-0 md:flex-wrap md:overflow-visible md:px-0"
+        >
+          <Chip
+            selected={!filters.category}
+            onClick={() => setFilters((f) => ({ ...f, category: undefined }))}
+          >
+            {t("feed.allCategories")}
+          </Chip>
+          {categories.data.map((c) => (
+            <Chip
+              key={c.slug}
+              selected={filters.category === c.slug}
+              onClick={() => setFilters((f) => ({ ...f, category: c.slug }))}
+            >
+              <span aria-hidden>{c.emoji}</span>
+              {c.name}
+            </Chip>
+          ))}
+        </div>
+      )}
       {geoDenied && (
         <p role="status" className="pb-3 text-sm text-ink-muted">
           {t("feed.nearDenied")}
@@ -85,7 +111,7 @@ export function FeedList() {
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((g) => (
             <li key={g.id}>
-              <GatheringCard g={g} />
+              <GatheringCard g={g} src="feed" />
             </li>
           ))}
         </ul>

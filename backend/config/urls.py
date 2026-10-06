@@ -11,6 +11,8 @@ api_v1 = [
     path("", include("apps.notifications.urls")),
     path("", include("apps.moderation.urls")),
     path("", include("apps.places.urls")),
+    path("", include("apps.catalog.urls")),
+    path("", include("apps.universities.urls")),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path("docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger"),
 ]
@@ -21,6 +23,11 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    # Только dev: фото из MEDIA_ROOT отдаёт Django (в production — S3)
+    from django.conf.urls.static import static
+
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
     # Только dev: вход по паролю в браузерный API DRF (/api/v1/auth/dev/login/)
     # под демо-пользователями, пока нет входа по телефону. В production этих URL нет.
     urlpatterns += [path("api/v1/auth/dev/", include("rest_framework.urls"))]

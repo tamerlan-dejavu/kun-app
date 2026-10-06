@@ -12,4 +12,6 @@ urlpatterns = [
     path("gatherings/<int:pk>/ratings", views.RatingsView.as_view()),
     path("me/gatherings", views.MyGatheringsView.as_view()),
     path("public/gatherings/<slug:slug>", views.PublicGatheringView.as_view()),
+    path("public/city", views.PublicCityView.as_view()),
+    path("for-you", views.ForYouView.as_view()),
 ]

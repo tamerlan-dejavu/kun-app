@@ -127,6 +127,12 @@ class Gathering(TimeStampedModel):
 class Participation(models.Model):
     """Участие в сборе. Выход не удаляет строку, а ставит left_at; повторный вход — новая строка."""
 
+    class Source(models.TextChoices):
+        FEED = "feed", "Лента"
+        FOR_YOU = "for_you", "Для тебя"
+        MAP = "map", "Карта"
+        LINK = "link", "Ссылка / другое"
+
     gathering = models.ForeignKey(
         Gathering, on_delete=models.CASCADE, related_name="participations"
     )
@@ -136,6 +142,13 @@ class Participation(models.Model):
     is_creator = models.BooleanField("создатель", default=False)
     joined_at = models.DateTimeField("присоединился", auto_now_add=True)
     left_at = models.DateTimeField("вышел", null=True, blank=True)
+    source = models.CharField(
+        "откуда пришёл",
+        max_length=16,
+        choices=Source.choices,
+        default=Source.LINK,
+        db_comment="для метрики ТЗ: конверсия «Для тебя» -> «Я пришёл» против ленты",
+    )
     late_leave = models.BooleanField(
         "поздний выход",
         default=False,

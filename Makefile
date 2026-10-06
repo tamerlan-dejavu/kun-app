@@ -23,6 +23,10 @@ superuser:
 seed:
 	$(COMPOSE) run --rm api python manage.py seed_demo
 
+# Ещё сборы на неделю и история встреч — для «Для тебя»
+seed-more:
+	$(COMPOSE) run --rm api python manage.py seed_demo --more
+
 # Пересоздать локальную БД с нуля: удаляет тома проекта kun-app (БД и статику), не трогая другие проекты
 reset-db:
 	$(COMPOSE) down -v
@@ -41,4 +45,4 @@ openapi:
 	$(COMPOSE) run --rm api python manage.py spectacular --file openapi.yaml
 	cd web && npm run gen:api
 
-.PHONY: up down logs migrate makemigrations superuser seed reset-db test-backend check-backend openapi
+.PHONY: up down logs migrate makemigrations superuser seed seed-more reset-db test-backend check-backend openapi

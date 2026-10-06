@@ -3,11 +3,12 @@
 import { t } from "@/i18n";
 import { Button } from "./Button";
 
-// Состояние «ошибка» с кнопкой «Повторить».
+// «Ошибка»: с кнопкой «Повторить».
 export function ErrorState({ message, onRetry }: { message?: string; onRetry?: () => void }) {
   return (
-    <div role="alert" className="flex flex-col items-center gap-4 px-6 py-14 text-center">
-      <p>{message ?? t("common.error")}</p>
+    <div role="alert" className="card flex flex-col items-start gap-4 border-danger p-8">
+      <p className="meta text-danger">ERROR</p>
+      <p className="text-lg font-semibold">{message ?? t("common.error")}</p>
       {onRetry && (
         <Button variant="secondary" onClick={onRetry}>
           {t("common.retry")}

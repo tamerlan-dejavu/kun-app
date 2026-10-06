@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: Props) {
   const dev = process.env.NODE_ENV === "development";
   return (
     <SiteShell>
-      <section className="mx-auto max-w-md space-y-4 rounded-card bg-surface p-8 shadow-card md:my-10">
+      <section className="card mx-auto max-w-md space-y-4 p-8 md:my-10">
         <h1 className="text-2xl">{t("login.title")}</h1>
         <p className="text-ink-muted">{t("login.soon")}</p>
         {dev && (

@@ -11,15 +11,15 @@ export function MessageBubble({ message, mine }: { message: Message; mine: boole
       {!mine && <Avatar size="sm" name={message.author?.name} photo={message.author?.photo} />}
       <div
         className={clsx(
-          "max-w-[78%] rounded-card px-4 py-2.5",
-          mine ? "rounded-br-md bg-brand-100" : "rounded-bl-md bg-surface shadow-card",
+          "max-w-[78%] border-2 border-ink px-4 py-2.5",
+          mine ? "bg-brand shadow-sm" : "bg-surface shadow-sm",
         )}
       >
-        {!mine && <p className="text-xs font-semibold text-brand-700">{message.author?.name}</p>}
+        {!mine && <p className="meta mb-1 font-bold text-brand-700">{message.author?.name}</p>}
         <p className={clsx("whitespace-pre-wrap break-words", message.is_hidden && "italic text-ink-muted")}>
           {message.is_hidden ? t("chat.hidden") : message.text}
         </p>
-        <p className="mt-0.5 text-right text-[11px] text-ink-muted">{formatTime(message.created_at)}</p>
+        <p className="mt-1 text-right font-mono text-[11px] text-ink-muted">{formatTime(message.created_at)}</p>
       </div>
     </div>
   );

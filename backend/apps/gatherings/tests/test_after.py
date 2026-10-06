@@ -63,3 +63,17 @@ def test_ratings_rules(client_for):
 
     assert post(a.id) == "rate_self"
     assert post(UserFactory().id) == "not_participant"
+
+
+def test_detail_shows_my_attendance_and_ratings(client_for):
+    g, (a, b) = started(hours_ago=2)
+    client = client_for(a)
+    client.post(f"{URL}/{g.id}/attendance")
+    client.post(
+        f"{URL}/{g.id}/ratings", {"ratings": [{"user_id": b.id, "value": "ok"}]}, format="json"
+    )
+    data = client.get(f"{URL}/{g.id}").json()
+    assert data["attended"] is True
+    assert data["my_ratings"] == {str(b.id): "ok"}
+    # оцениваемый не видит, кто его оценил
+    assert client_for(b).get(f"{URL}/{g.id}").json()["my_ratings"] == {}

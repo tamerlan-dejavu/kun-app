@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { t } from "@/i18n";
 import { PageTitle } from "@/components/layout/PageTitle";
 import { FeedList } from "@/components/gathering/FeedList";
+import { ForYouTeaser } from "@/components/forYou/ForYouTeaser";
 
 export const metadata: Metadata = { title: "Лента" };
 
@@ -10,6 +11,7 @@ export default function FeedPage() {
   return (
     <>
       <PageTitle title={t("feed.title")} />
+      <ForYouTeaser />
       <FeedList />
     </>
   );
